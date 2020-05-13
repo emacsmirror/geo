@@ -1,4 +1,4 @@
-;;; geo-xdg.el --- Geolocation services for GNU Emacs
+;;; geo-xdg.el --- Geolocation services for GNU Emacs -*- lexical-binding: t; -*-
 
 ;; Copyright (c) 2020 Would (oldosfan).
 
