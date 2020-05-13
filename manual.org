@@ -44,12 +44,12 @@
    Certain aspects of geo-xdg can be customized by users via the following
    variables:
 
-   - ~geo-xdg-cache-function~ ::
-     A function that should return a cached location, or nil if none exists.
-     The default value is ~geo-xdg-get-cache~.
-   - ~geo-xdg-save-cache-function~ ::
-     A function that accepts a single location value,
-     which should be saved into the cache.
+    - ~geo-xdg-cache-function~ ::
+      A function that should return a cached location, or nil if none exists.
+      The default value is ~geo-xdg-get-cache~.
+    - ~geo-xdg-save-cache-function~ ::
+      A function that accepts a single location value,
+      which should be saved into the cache.
 
 * geo-xdg-solar
   ~geo-xdg-solar~ is a package that sets ~calendar-latitude~
