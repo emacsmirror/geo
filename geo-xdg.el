@@ -33,14 +33,21 @@
 (defvar geo-xdg--client-already-connected nil
   "Whether or not the LocationUpdated has already been attached.")
 
-(defvar geo-xdg-changed-hooks nil
-  "A list of functions to be called with the location data when it is updated.")
-
 (defvar geo-xdg--last-location nil
   "The last registered location.")
 
 (defvar geo-xdg--things-to-unregister nil
   "A list of items to be unregistered.")
+
+(defvar geo-xdg-changed-hooks nil
+  "A list of functions to be called with the location data when it is updated.")
+
+(defvar geo-xdg-cache-function #'geo-xdg-get-cache
+  "A function that returns the cached location.")
+
+(defvar geo-xdg-save-cache-function #'geo-xdg-save-cache
+  "A function that saves the cached value.
+It should take one argument, the value to be saved.")
 
 (cl-deftype geo-xdg--location ()
   '(satisfies geo-xdg--location-p))
@@ -57,6 +64,27 @@
      "/org/freedesktop/GeoClue2/Manager"
      "org.freedesktop.GeoClue2.Manager"
      "CreateClient")))
+
+(defun geo-xdg-save-cache (cache)
+  "Set CACHE as the cached location."
+  (ignore-errors
+    (save-window-excursion
+      (with-current-buffer (find-file (concat user-emacs-directory
+					      "geo-xdg-cache.el"))
+	(erase-buffer)
+	(print cache (current-buffer))
+	(save-buffer)
+	(kill-buffer)))))
+
+(defun geo-xdg-get-cache ()
+  "Retrieve the cached location."
+  (save-window-excursion
+    (when (file-exists-p (concat user-emacs-directory
+				 "geo-xdg-cache.el"))
+      (with-current-buffer (find-file (concat user-emacs-directory
+					      "geo-xdg-cache.el"))
+	(set-window-point nil (point-min))
+	(read (current-buffer))))))
 
 (defun geo-xdg--maybe-setup ()
   "Set up GeoClue related interfaces if necessary."
@@ -113,7 +141,9 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
   (ignore-errors
     (setq geo-xdg--last-location (geo-xdg--location-data new)))
   (ignore-errors
-    (run-hook-with-args 'geo-xdg-changed-hooks (geo-xdg--location-data new))))
+    (funcall geo-xdg-save-cache-function geo-xdg--last-location))
+  (ignore-errors
+    (run-hook-with-args 'geo-xdg-changed-hooks geo-xdg--last-location)))
 
 (defun geo-xdg--register-signals ()
   "Register the LocationUpdated signal for the current GeoClue client."
@@ -163,6 +193,16 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
     (when (geo-xdg--available-p)
       (geo-xdg--maybe-setup)
       (geo-xdg--register-signals))))
+
+(defun geo-xdg--restore-from-cached-value ()
+  "Restore the current location from the cached value."
+  (let ((c (funcall geo-xdg-cache-function)))
+    (when c
+      (setq geo-xdg--last-location c)
+      (ignore-errors
+	(run-hook-with-args 'geo-xdg-changed-hooks c)))))
+
+(geo-xdg--restore-from-cached-value)
 
 (run-with-timer 0 60 #'geo-xdg--maybe-setup-timer-cb)
 
