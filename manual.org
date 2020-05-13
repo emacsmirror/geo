@@ -1,12 +1,25 @@
 #+startup: nofold
 
+* Table of Contents :TOC:
+- [[geo-xdg]]
+  - [[Endpoints]]
+    - [[geo-xdg-last-location]]
+    - [[geo-xdg-changed-hooks]]
+  - [[Location Format]]
+  - [[User Customization]]
+- [[geo-xdg-solar]]
+  - [[Using geo-xdg-solar]]
+
 * geo-xdg
   ~~geo-xdg~~ is an Emacs Lisp library for interfacing with the XDG
   GeoClue geolocation API.  There are 2 entry-points for using the API:
+  <<Endpoints>>
+  <<geo-xdg-last-location>>
   - ~~geo-xdg-last-location~~ ::
     This variable stores the last recieved location, in a format
     described inside [[Location Format]].  It may be nil if no location
     exists.
+  <<geo-xdg-changed-hooks>>
   - ~~geo-xdg-changed-hooks~~ ::
     This hook stores a list of functions that accept a single argument
     ~~LOCATION~~, which should be the new location.  The functions are
@@ -21,7 +34,7 @@
    - ~~alt~~ :: The altitude of this location in metres.  May be nil.
    - ~~speed~~ :: The speed the device is traveling at.  May be nil.
    - ~~description~~ :: A short description of this location.  May be nil.
-** User customization
+** User Customization
    Certain aspects of geo-xdg can be customized by users via the following
    variables:
 
@@ -39,7 +52,7 @@
   function will also consider ~~calendar-latitude~~ and
   ~~calendar-longitude~~, and those variables will be set to the
   appropriate values whenever the location is changed.
-
+  <<Using geo-xdg-solar>>
   To use geo-xdg-solar, place the following code in your initialization
   files, and place geo-xdg and geo-xdg-solar in your ~~load-path~~:
 #+begin_src elisp
