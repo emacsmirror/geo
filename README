@@ -3,3 +3,5 @@
 * geo-xdg.el
 `geo-xdg' provides location information to GNU Emacs, using the XDG GeoClue API.
 `geo-xdg-solar' provides location information to calendar.el, using `geo-xdg'.
+
+Some documentation is provided inside the docstrings, and a manual is also available.
