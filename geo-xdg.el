@@ -39,6 +39,9 @@
 (defvar geo-xdg--last-location nil
   "The last registered location.")
 
+(defvar geo-xdg--things-to-unregister nil
+  "A list of items to be unregistered.")
+
 (cl-deftype geo-xdg--location ()
   '(satisfies geo-xdg--location-p))
 
@@ -115,17 +118,19 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 (defun geo-xdg--register-signals ()
   "Register the LocationUpdated signal for the current GeoClue client."
   (geo-xdg--maybe-setup)
-  (dbus-set-property :system "org.freedesktop.GeoClue2"
-		     geo-xdg--client
-		     "org.freedesktop.GeoClue2.Client"
-		     "DesktopId"
-		     "Emacs")
   (unless geo-xdg--client-already-connected
-    (dbus-register-signal :system "org.freedesktop.GeoClue2"
-			  geo-xdg--client
-			  "org.freedesktop.GeoClue2.Client"
-			  "LocationUpdated"
-			  #'geo-xdg--dbus-callback)
+    (add-to-list 'geo-xdg--things-to-unregister
+		 (dbus-set-property :system "org.freedesktop.GeoClue2"
+				    geo-xdg--client
+				    "org.freedesktop.GeoClue2.Client"
+				    "DesktopId"
+				    "Emacs"))
+    (add-to-list 'geo-xdg--things-to-unregister
+		 (dbus-register-signal :system "org.freedesktop.GeoClue2"
+				       geo-xdg--client
+				       "org.freedesktop.GeoClue2.Client"
+				       "LocationUpdated"
+				       #'geo-xdg--dbus-callback))
     (setq geo-xdg--client-already-connected t))
   (dbus-call-method :system "org.freedesktop.GeoClue2"
 		    geo-xdg--client
@@ -138,6 +143,19 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 		    geo-xdg--client
 		    "org.freedesktop.GeoClue2.Client"
 		    "Stop"))
+
+(defun geo-xdg--destroy-client ()
+  "Destroy and nil out `geo-xdg--client'."
+  (when geo-xdg--client
+    (setq geo-xdg--client-already-connected nil)
+    (dbus-call-method
+     :system "org.freedesktop.GeoClue2"
+     "/org/freedesktop/GeoClue2/Manager"
+     "org.freedesktop.GeoClue2.Manager"
+     "DeleteClient"
+     :object-path geo-xdg--client)
+    (setq geo-xdg--client nil)
+    (mapc #'dbus-unregister-object geo-xdg--things-to-unregister)))
 
 (defun geo-xdg--maybe-setup-timer-cb ()
   "Periodically check if GeoClue is available, and set up the client if it is."
