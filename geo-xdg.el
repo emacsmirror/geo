@@ -84,7 +84,8 @@ It should take one argument, the value to be saved.")
       (with-current-buffer (find-file (concat user-emacs-directory
 					      "geo-xdg-cache.el"))
 	(set-window-point nil (point-min))
-	(read (current-buffer))))))
+	(read (current-buffer))
+	(kill-buffer)))))
 
 (defun geo-xdg--maybe-setup ()
   "Set up GeoClue related interfaces if necessary."
