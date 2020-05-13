@@ -30,8 +30,8 @@
 (defun geo-xdg-circadian--on-changed (geo)
   "Set circadian geo values according to GEO."
   (when geo
-    (setq calendar-latitude (cdr (assq 'lat geo)))
-    (setq calendar-longitude (cdr (assq 'lon geo)))))
+    (setq calendar-latitude (geo-xdg-lat geo))
+    (setq calendar-longitude (geo-xdg-lon geo))))
 
 (add-hook 'geo-xdg-changed-hooks #'geo-xdg-circadian--on-changed)
 

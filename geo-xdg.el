@@ -66,18 +66,18 @@
   (and (stringp loc)
        (string-prefix-p (concat geo-xdg--client "/Location") loc)))
 
-(defun geo-xdg--location-lat-long (loc)
+(defun geo-xdg-location-lat-long (loc)
   "Return the latitude and longitude stored in LOC as a cons pair."
-  (cons (assq 'lat loc)
-	(assq 'lon loc)))
+  (cons (cdr (assq 'lat loc))
+	(cdr (assq 'lon loc))))
 
-(defun geo-xdg--lat (loc)
+(defun geo-xdg-lat (loc)
   "Return the latitude stored inside LOC."
-  (car (geo-xdg--location-lat-long loc)))
+  (car (geo-xdg-location-lat-long loc)))
 
-(defun geo-xdg--lon (loc)
+(defun geo-xdg-lon (loc)
   "Return the longitude stored inside LOC."
-  (cdr (geo-xdg--location-lat-long loc)))
+  (cdr (geo-xdg-location-lat-long loc)))
 
 (defun geo-xdg--location-data (loc)
   "Return the data stored inside LOC.
