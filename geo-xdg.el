@@ -78,13 +78,21 @@ It should take one argument, the value to be saved.")
 
 (defun geo-xdg-get-cache ()
   "Retrieve the cached location."
-  (save-window-excursion
-    (when (file-exists-p (concat user-emacs-directory
-				 "geo-xdg-cache.el"))
-      (with-current-buffer (find-file (concat user-emacs-directory
-					      "geo-xdg-cache.el"))
-	(set-window-point nil (point-min))
-	(read (current-buffer))))))
+  (or
+   (save-window-excursion
+     (when (file-exists-p (concat user-emacs-directory
+				  "geo-xdg-cache.el"))
+       (with-current-buffer (find-file (concat user-emacs-directory
+					       "geo-xdg-cache.el"))
+	 (set-window-point nil (point-min))
+	 (read (current-buffer)))))
+   (and (boundp 'calendar-latitude)
+	(boundp 'calendar-longitude)
+	`((lat . ,calendar-latitude)
+	  (lon . ,calendar-longitude)
+	  (alt . 0.0)
+	  (speed . 0.0)
+	  (description . "")))))
 
 (defun geo-xdg--maybe-setup ()
   "Set up GeoClue related interfaces if necessary."
