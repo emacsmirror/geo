@@ -104,9 +104,8 @@ The returned data will be stored in the following format:
 				       loc "org.freedesktop.GeoClue2.Location"
 				       "Description"))))
 
-(defun geo-xdg--dbus-callback (old new)
+(defun geo-xdg--dbus-callback (_ new)
   "Callback for GeoClue2's LocationUpdated signal.
-OLD should be the old location as an `org.freedesktop.GeoClue2.Location'.
 NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
   (ignore-errors
     (setq geo-xdg--last-location (geo-xdg--location-data new)))
