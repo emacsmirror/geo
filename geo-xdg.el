@@ -33,14 +33,14 @@
 (defvar geo-xdg--client-already-connected nil
   "Whether or not the LocationUpdated has already been attached.")
 
-(defvar geo-xdg--last-location nil
-  "The last registered location.")
-
 (defvar geo-xdg--things-to-unregister nil
   "A list of items to be unregistered.")
 
 (defvar geo-xdg-changed-hooks nil
   "A list of functions to be called with the location data when it is updated.")
+
+(defvar geo-xdg-last-location nil
+  "The last registered location.")
 
 (defvar geo-xdg-cache-function #'geo-xdg-get-cache
   "A function that returns the cached location.")
@@ -139,11 +139,11 @@ The returned data will be stored in the following format:
   "Callback for GeoClue2's LocationUpdated signal.
 NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
   (ignore-errors
-    (setq geo-xdg--last-location (geo-xdg--location-data new)))
+    (setq geo-xdg-last-location (geo-xdg--location-data new)))
   (ignore-errors
-    (funcall geo-xdg-save-cache-function geo-xdg--last-location))
+    (funcall geo-xdg-save-cache-function geo-xdg-last-location))
   (ignore-errors
-    (run-hook-with-args 'geo-xdg-changed-hooks geo-xdg--last-location)))
+    (run-hook-with-args 'geo-xdg-changed-hooks geo-xdg-last-location)))
 
 (defun geo-xdg--register-signals ()
   "Register the LocationUpdated signal for the current GeoClue client."
@@ -198,7 +198,7 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
   "Restore the current location from the cached value."
   (let ((c (funcall geo-xdg-cache-function)))
     (when c
-      (setq geo-xdg--last-location c)
+      (setq geo-xdg-last-location c)
       (ignore-errors
 	(run-hook-with-args 'geo-xdg-changed-hooks c)))))
 
