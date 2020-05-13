@@ -36,11 +36,13 @@
 (defun geo-xdg-circadian--cache-advice (other &rest args)
   "Advice for OTHER with ARGS."
   (or (apply other args)
-      `((lat . ,calendar-latitude)
-	(lon . ,calendar-longitude)
-	(alt . 0.0)
-	(speed . 0.0)
-	(description . ""))))
+      (and calendar-latitude
+	   calendar-longitude
+	   `((lat . ,calendar-latitude)
+	     (lon . ,calendar-longitude)
+	     (alt . 0.0)
+	     (speed . 0.0)
+	     (description . "")))))
 
 (advice-add 'geo-xdg-get-cache :around #'geo-xdg-circadian--cache-advice)
 
