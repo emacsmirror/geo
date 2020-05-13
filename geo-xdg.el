@@ -198,8 +198,8 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 (defun geo-xdg--restore-from-cached-value ()
   "Restore the current location from the cached value."
   (let ((c (funcall geo-xdg-cache-function)))
+    (setq geo-xdg-last-location c)
     (when c
-      (setq geo-xdg-last-location c)
       (ignore-errors
 	(run-hook-with-args 'geo-xdg-changed-hooks c)))))
 

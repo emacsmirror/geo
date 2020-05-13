@@ -36,20 +36,20 @@
 (defun geo-xdg-circadian--cache-advice (other &rest args)
   "Advice for OTHER with ARGS."
   (or (apply other args)
-      (and calendar-latitude
-	   calendar-longitude
-	   `((lat . ,calendar-latitude)
-	     (lon . ,calendar-longitude)
-	     (alt . 0.0)
-	     (speed . 0.0)
-	     (description . "")))))
+      (when (and calendar-latitude
+		 calendar-longitude)
+	`((lat . ,calendar-latitude)
+	  (lon . ,calendar-longitude)
+	  (alt . 0.0)
+	  (speed . 0.0)
+	  (description . "")))))
 
 (advice-add 'geo-xdg-get-cache :around #'geo-xdg-circadian--cache-advice)
 
 (add-hook 'geo-xdg-changed-hooks #'geo-xdg-circadian--on-changed)
 
-(geo-xdg-circadian--on-changed geo-xdg-last-location)
 (geo-xdg--restore-from-cached-value)
+(geo-xdg-circadian--on-changed geo-xdg-last-location)
 
 (provide 'geo-xdg-solar)
 ;;; geo-xdg-solar.el ends here
