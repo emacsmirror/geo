@@ -69,8 +69,9 @@ It should take one argument, the value to be saved.")
   "Set CACHE as the cached location."
   (ignore-errors
     (save-window-excursion
-      (with-current-buffer (find-file (concat user-emacs-directory
-					      "geo-xdg-cache.el"))
+      (with-current-buffer (find-file-noselect (concat user-emacs-directory
+						       "geo-xdg-cache.el")
+					       nil nil nil)
 	(erase-buffer)
 	(print cache (current-buffer))
 	(save-buffer)
@@ -81,8 +82,9 @@ It should take one argument, the value to be saved.")
   (save-window-excursion
     (when (file-exists-p (concat user-emacs-directory
 				 "geo-xdg-cache.el"))
-      (with-current-buffer (find-file (concat user-emacs-directory
-					      "geo-xdg-cache.el"))
+      (with-current-buffer (find-file-noselect (concat user-emacs-directory
+						       "geo-xdg-cache.el")
+					       nil nil nil)
 	(set-window-point nil (point-min))
 	(prog1 (read (current-buffer))
 	  (kill-buffer))))))
