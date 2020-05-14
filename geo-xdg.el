@@ -85,7 +85,7 @@ It should take one argument, the value to be saved.")
       (with-current-buffer (find-file-noselect (concat user-emacs-directory
 						       "geo-xdg-cache.el")
 					       nil nil nil)
-	(set-window-point nil (point-min))
+	(goto-char (point-min))
 	(prog1 (read (current-buffer))
 	  (kill-buffer))))))
 
@@ -204,6 +204,16 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
     (when c
       (ignore-errors
 	(run-hook-with-args 'geo-xdg-changed-hooks c)))))
+
+(defun geo-xdg-pause ()
+  "Stop GeoClue update signals."
+  (interactive)
+  (geo-xdg--unregister-signals))
+
+(defun geo-xdg-resume ()
+  "Resume GeoClue update signals."
+  (interactive)
+  (geo-xdg--register-signals))
 
 (geo-xdg--restore-from-cached-value)
 
