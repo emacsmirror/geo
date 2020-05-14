@@ -1,15 +1,5 @@
 #+startup: nofold
 
-* Table of Contents :TOC:
-- [[geo-xdg]]
-  - [[Endpoints]]
-    - [[geo-xdg-last-location]]
-    - [[geo-xdg-changed-hooks]]
-  - [[Location Format]]
-  - [[User Customization]]
-- [[geo-xdg-solar]]
-  - [[Using geo-xdg-solar]]
-
 * geo-xdg
   ~geo-xdg~ is an Emacs Lisp library for interfacing with the XDG
   GeoClue geolocation API.  There are 2 entry-points for using the API:
@@ -50,6 +40,23 @@
     - ~geo-xdg-save-cache-function~ ::
       A function that accepts a single location value,
       which should be saved into the cache.
+
+** User commands
+   geo-xdg provides several commands that can be used to change geo-xdg behaviour:
+    - ~geo-xdg-pause~ :: Stop receiving location updates
+    - ~geo-xdg-resume~ :: Resume recieving location updates
+    - ~geo-xdg-focus-changed~ ::
+      A convenience function that disables or enables
+      location updates, depending on whether Emacs has input focus.
+
+      It should be attached to ~after-focus-change-function~.
+      To use the function, append the following code to your init files:
+#+begin_src elisp
+(if (version<= "27" emacs-version)
+    (add-function :after after-focus-change-function #'geo-xdg-focus-changed)
+  (add-hook 'focus-in-hook #'geo-xdg-resume) ;; We don't have `after-focus-change-function'
+  (add-hook 'focus-out-hook #'geo-xdg-pause))
+#+end_src
 
 * geo-xdg-solar
   ~geo-xdg-solar~ is a package that sets ~calendar-latitude~

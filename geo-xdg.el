@@ -215,6 +215,14 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
   (interactive)
   (geo-xdg--register-signals))
 
+(defun geo-xdg-focus-changed ()
+  "Convenience function to be added to `after-focus-change-function'."
+  (if (not (cl-reduce (lambda (z y)
+			(and z (frame-focus-state y)))
+			(frame-list)))
+      (geo-xdg-pause)
+    (geo-xdg-resume)))
+
 (geo-xdg--restore-from-cached-value)
 
 (run-with-timer 0 60 #'geo-xdg--maybe-setup-timer-cb)
