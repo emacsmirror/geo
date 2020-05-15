@@ -1,5 +1,22 @@
 #+startup: nofold
 
+* geo
+  ~geo~ is an Emacs Lisp library for retrieving live location data.
+  It is extensible and allows for multiple backends.
+
+  The primary endpoint for interfacing with ~geo~ is the Lisp variable
+  ~geo-xdg-changed-hook~, which accepts functions accepting a single
+  location argument.  The location objects are alists guaranteed to
+  have 3 fields:
+    - ~lat~ :: The latitude of the location.
+    - ~lon~ :: The longitude of the location.
+    - ~dt~ :: The time the location was recorded, in epoch seconds.
+
+  Several convenience functions are provided for retrieving location fields:
+    - ~geo-xdg-location-lat~ :: Returns the latitude of the location
+    - ~geo-xdg-location-lon~ :: Returns the longitude of the location
+
+
 * geo-xdg
   ~geo-xdg~ is an Emacs Lisp library for interfacing with the XDG
   GeoClue geolocation API.  There are 2 entry-points for using the API:
@@ -14,6 +31,13 @@
      This hook stores a list of functions that accept a single argument
      ~LOCATION~, which should be the new location.  The functions are
      called whenever the current location is changed.
+
+  geo-xdg is also a backend for the ~geo~ geolocation library.
+  To use it with geo, append the following to your initialization files:
+#+begin_src elisp
+(require 'geo)
+(require 'geo-xdg)
+#+end_src
 
   To use geo-xdg, Emacs must be built with Dbus support.
 ** Location Format
