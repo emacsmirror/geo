@@ -229,7 +229,7 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
   "Convenience function to be added to `after-focus-change-function'."
   (if (not (cl-reduce (lambda (z y)
 			(and z (frame-focus-state y)))
-			(frame-list)))
+		      (frame-list)))
       (geo-xdg-pause)
     (geo-xdg-resume)))
 
