@@ -27,6 +27,8 @@
 (require 'dbus)
 (require 'cl-lib)
 
+(declare-function geo-enable-backend "geo.el")
+
 (defvar geo-xdg--client nil
   "The current XDG geo client.")
 
