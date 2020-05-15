@@ -45,6 +45,9 @@
 (defvar geo-xdg-cache-function #'geo-xdg-get-cache
   "A function that returns the cached location.")
 
+(defvar geo-xdg-restored-from-cache t
+  "Whether or not the last location was restored from cache.")
+
 (defvar geo-xdg-save-cache-function #'geo-xdg-save-cache
   "A function that saves the cached value.
 It should take one argument, the value to be saved.")
@@ -144,6 +147,7 @@ The returned data will be stored in the following format:
 NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
   (ignore-errors
     (setq geo-xdg-last-location (geo-xdg--location-data new)))
+  (setq geo-xdg-restored-from-cache nil)
   (ignore-errors
     (funcall geo-xdg-save-cache-function geo-xdg-last-location))
   (ignore-errors
@@ -227,6 +231,20 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 (geo-xdg--restore-from-cached-value)
 
 (run-with-timer 0 60 #'geo-xdg--maybe-setup-timer-cb)
+
+(defun geo-xdg--data-outdated-p ()
+  "Return whether the current data was restored from cache."
+  geo-xdg-restored-from-cache)
+
+(defun geo-xdg--geo-register (fn)
+  "Register the Geo backend FN to recieve location callbacks."
+  (funcall fn geo-xdg-last-location)
+  (add-hook 'geo-xdg-changed-hooks fn))
+
+(eval-after-load "geo"
+  (lambda ()
+    (geo-enable-backend #'geo-xdg--geo-register
+			#'geo-xdg--data-outdated-p 1)))
 
 (provide 'geo-xdg)
 ;;; geo-xdg.el ends here
