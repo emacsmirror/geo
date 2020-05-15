@@ -2,7 +2,8 @@
 
 * geo
   ~geo~ is an Emacs Lisp library for retrieving live location data.
-  It is extensible and allows for multiple backends.
+  It is extensible and allows for multiple backends.  To create backends,
+  please view [[Creating Backends]].
 
   The primary endpoint for interfacing with ~geo~ is the Lisp variable
   ~geo-xdg-changed-hook~, which accepts functions accepting a single
@@ -16,17 +17,29 @@
     - ~geo-xdg-location-lat~ :: Returns the latitude of the location
     - ~geo-xdg-location-lon~ :: Returns the longitude of the location
 
+** Creating Backends
+   geo backends are primarily created via the function ~geo-enable-backend~,
+   which accepts 3 arguments:
+    - ~subscribe-function~ ::
+      This should be a procedure accepting one argument, which is another
+      function that should be called with the current location whenever
+      it is changed, or the backend is created.
+    - ~outdated-p-function~ ::
+      This should be a procedure accepting zero arguments, that returns
+      a non-nil value if the backend should be considered as containing
+      potentially outdated data.
+    - ~priority~ ::
+      This should be a fixnum.  The higher the fixnum is, the more priority
+      the backend will get.
+
 
 * geo-xdg
   ~geo-xdg~ is an Emacs Lisp library for interfacing with the XDG
   GeoClue geolocation API.  There are 2 entry-points for using the API:
-  <<Endpoints>>
-   <<geo-xdg-last-location>>
    - ~geo-xdg-last-location~ ::
      This variable stores the last recieved location, in a format
      described inside [[Location Format]].  It may be nil if no location
      exists.
-   <<geo-xdg-changed-hooks>>
    - ~geo-xdg-changed-hooks~ ::
      This hook stores a list of functions that accept a single argument
      ~LOCATION~, which should be the new location.  The functions are
@@ -89,7 +102,7 @@
   function will also consider ~calendar-latitude~ and
   ~calendar-longitude~, and those variables will be set to the
   appropriate values whenever the location is changed.
-  <<Using geo-xdg-solar>>
+** Using geo-xdg-solar
   To use geo-xdg-solar, place the following code in your initialization
   files, and place geo-xdg and geo-xdg-solar in your ~load-path~:
 #+begin_src elisp
