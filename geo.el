@@ -97,18 +97,18 @@ The higher it is, the more important BACKEND is."
 						(geo--update-handler l backend)))
       (setq geo--enabled-backends (cons backend geo--enabled-backends)))))
 
-(defun geo-xdg-location (lat lon timestamp rest)
+(defun geo-location (lat lon timestamp rest)
   "Create a location with the latitude LAT, the longitude LON, and TIMESTAMP.
 Additional data can be stored inside REST."
   (append `((lat . ,lat)
 	    (lon . ,lon)
 	    (dt . ,timestamp)) rest))
 
-(defun geo-xdg-location-lat (loc)
+(defun geo-location-lat (loc)
   "Return LOC's latitude."
   (cdr (assq 'lat loc)))
 
-(defun geo-xdg-location-lon (loc)
+(defun geo-location-lon (loc)
   "Return LOC's longitude."
   (cdr (assq 'lon loc)))
 
