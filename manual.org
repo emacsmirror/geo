@@ -14,8 +14,8 @@
     - ~dt~ :: The time the location was recorded, in epoch seconds.
 
   Several convenience functions are provided for retrieving location fields:
-    - ~geo-xdg-location-lat~ :: Returns the latitude of the location
-    - ~geo-xdg-location-lon~ :: Returns the longitude of the location
+    - ~geo-location-lat~ :: Returns the latitude of the location
+    - ~geo-location-lon~ :: Returns the longitude of the location
 
 ** Creating Backends
    geo backends are primarily created via the function ~geo-enable-backend~,
