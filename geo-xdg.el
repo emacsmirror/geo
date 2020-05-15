@@ -202,10 +202,10 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 
 (defun geo-xdg--maybe-setup-timer-cb ()
   "Periodically check if GeoClue is available, and set up the client if it is."
-  (when (not geo-xdg--client)
-    (when (geo-xdg--available-p)
-      (geo-xdg--maybe-setup)
-      (geo-xdg--register-signals))))
+  (when (and (not geo-xdg--client)
+	     (geo-xdg--available-p))
+    (geo-xdg--maybe-setup)
+    (geo-xdg--register-signals)))
 
 (defun geo-xdg--restore-from-cached-value ()
   "Restore the current location from the cached value."
