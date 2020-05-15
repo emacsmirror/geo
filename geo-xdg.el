@@ -140,7 +140,10 @@ The returned data will be stored in the following format:
 				 "Speed"))
     (description . ,(dbus-get-property :system "org.freedesktop.GeoClue2"
 				       loc "org.freedesktop.GeoClue2.Location"
-				       "Description"))))
+				       "Description"))
+    (dt . ,(car (dbus-get-property :system "org.freedesktop.GeoClue2"
+				   loc "org.freedesktop.GeoClue2.Location"
+				   "Timestamp")))))
 
 (defun geo-xdg--dbus-callback (_ new)
   "Callback for GeoClue2's LocationUpdated signal.
@@ -234,7 +237,8 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 
 (defun geo-xdg--data-outdated-p ()
   "Return whether the current data was restored from cache."
-  geo-xdg-restored-from-cache)
+  geo-xdg-restored-from-cache
+  (< (- (float-time) (cdr (assq 'dt geo-xdg-last-location))) 100000))
 
 (defun geo-xdg--geo-register (fn)
   "Register the Geo backend FN to recieve location callbacks."
