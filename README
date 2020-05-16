@@ -3,7 +3,7 @@
 This directory tree holds 3 Emacs packages:
  - The geo-xdg Lisp library.
  - The geo Lisp library.
- - The geo-xdg-solar Lisp package.
+ - The geo-solar Lisp package.
 
 * geo-xdg.el
 `geo-xdg' provides location information to GNU Emacs, using the XDG GeoClue API.
