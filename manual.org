@@ -17,6 +17,9 @@
     - ~geo-location-lat~ :: Returns the latitude of the location
     - ~geo-location-lon~ :: Returns the longitude of the location
 
+  To retrieve the last known position, you may also use the function
+  ~geo-last-location~.
+
 ** Creating Backends
    geo backends are primarily created via the function ~geo-enable-backend~,
    which accepts 3 arguments:
