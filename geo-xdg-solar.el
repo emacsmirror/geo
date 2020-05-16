@@ -24,32 +24,9 @@
 
 ;;; Code:
 
-(require 'geo-xdg)
-(require 'solar)
+(warn "geo-xdg-solar is deprecated! Please use geo-solar instead.")
 
-(defun geo-xdg-circadian--on-changed (geo)
-  "Set circadian geo values according to GEO."
-  (when geo
-    (setq calendar-latitude (geo-xdg-lat geo))
-    (setq calendar-longitude (geo-xdg-lon geo))))
-
-(defun geo-xdg-circadian--cache-advice (other &rest args)
-  "Advice for OTHER with ARGS."
-  (or (apply other args)
-      (when (and calendar-latitude
-		 calendar-longitude)
-	`((lat . ,calendar-latitude)
-	  (lon . ,calendar-longitude)
-	  (alt . 0.0)
-	  (speed . 0.0)
-	  (description . "")))))
-
-(advice-add 'geo-xdg-get-cache :around #'geo-xdg-circadian--cache-advice)
-
-(add-hook 'geo-xdg-changed-hooks #'geo-xdg-circadian--on-changed)
-
-(geo-xdg--restore-from-cached-value)
-(geo-xdg-circadian--on-changed geo-xdg-last-location)
+(require 'geo-solar)
 
 (provide 'geo-xdg-solar)
 ;;; geo-xdg-solar.el ends here

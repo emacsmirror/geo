@@ -96,15 +96,12 @@
 #+end_src
 
 * geo-xdg-solar
-  ~geo-xdg-solar~ is a package that sets ~calendar-latitude~
-  and ~calendar-longitude~ to the current location provided by
-  geo-xdg.  When ~geo-xdg-solar~ is activated, the default cache
-  function will also consider ~calendar-latitude~ and
-  ~calendar-longitude~, and those variables will be set to the
-  appropriate values whenever the location is changed.
-** Using geo-xdg-solar
-  To use geo-xdg-solar, place the following code in your initialization
-  files, and place geo-xdg and geo-xdg-solar in your ~load-path~:
+  ~geo-xdg-solar~ is deprecated, and now requires ~geo-solar~.
+
+* geo-solar
+  ~geo-solar~ is a package that sets ~calendar-longitude~ and ~calendar-latitude~
+  according to the current location set inside ~geo.el~.  To use ~geo-solar~, add
+  the following code to your initialization files:
 #+begin_src elisp
-(require 'geo-xdg-solar)
+(require 'geo-solar)
 #+end_src

@@ -78,14 +78,10 @@ The higher it is, the more important BACKEND is."
 	 (bad-slots (cl-remove-if-not (lambda (i)
 					(not (memq i good-slots)))
 				      geo--backend-slots)))
-    (let ((good-entry (car-safe (cl-sort (mapcar #'cdr
-						 good-slots)
-					 (lambda (x i)
-					   (> (car x) (car i))))))
-	  (bad-entry (car-safe (cl-sort (mapcar #'cdr
-						bad-slots)
-					(lambda (x i)
-					   (> (car x) (car i)))))))
+    (let ((good-entry (car-safe (mapcar #'cdr (cl-sort good-slots (lambda (x i)
+								    (> (caar x) (caar i)))))))
+	  (bad-entry (car-safe (mapcar #'cdr (cl-sort bad-slots (lambda (x i)
+								  (> (caar x) (caar i))))))))
       (or good-entry bad-entry))))
 
 (defun geo-enable-backend (subscribe-function outdated-p-function priority)
@@ -111,6 +107,10 @@ Additional data can be stored inside REST."
 (defun geo-location-lon (loc)
   "Return LOC's longitude."
   (cdr (assq 'lon loc)))
+
+(defun geo-last-location ()
+  "Return the last known location from geo.el."
+  (geo--sort-slots))
 
 (provide 'geo)
 ;;; geo.el ends here

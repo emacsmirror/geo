@@ -250,7 +250,7 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 (eval-after-load "geo"
   (lambda ()
     (geo-enable-backend #'geo-xdg--geo-register
-			#'geo-xdg--data-outdated-p 1)))
+			#'geo-xdg--data-outdated-p 3)))
 
 (provide 'geo-xdg)
 ;;; geo-xdg.el ends here
