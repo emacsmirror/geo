@@ -240,7 +240,7 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 (defun geo-xdg--data-outdated-p ()
   "Return whether the current data was restored from cache."
   geo-xdg-restored-from-cache
-  (< (- (float-time) (cdr (assq 'dt geo-xdg-last-location))) 100000))
+  (> (- (float-time) (cdr (assq 'dt geo-xdg-last-location))) 100000))
 
 (defun geo-xdg--geo-register (fn)
   "Register the Geo backend FN to recieve location callbacks."
