@@ -244,8 +244,8 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 
 (defun geo-xdg--geo-register (fn)
   "Register the Geo backend FN to recieve location callbacks."
-  (funcall fn geo-xdg-last-location)
-  (add-hook 'geo-xdg-changed-hooks fn))
+  (add-hook 'geo-xdg-changed-hooks fn)
+  (run-hook-with-args 'geo-xdg-changed-hooks geo-xdg-last-location))
 
 (eval-after-load "geo"
   (lambda ()
