@@ -108,3 +108,17 @@
 #+begin_src elisp
 (require 'geo-solar)
 #+end_src
+
+* geo-ip
+  ~geo-ip~ is an IP geolocation provider for ~geo.el~.  To use geo-ip, place
+  the following code in your initialization files:
+#+begin_src elisp
+(require 'geo-ip)
+#+end_src
+
+** User customization
+   geo-ip can be customized via the following variables:
+     - ~geo-ip-urls~ ::
+       A list of URLs to be used for fetching the geolocation. The URLs should take no
+       arguments, and return a json object with the fields "longitude" and "latitude",
+       which should be doubles.
