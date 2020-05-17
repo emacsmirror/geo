@@ -35,6 +35,10 @@
 (defvar geo-ip--changed-hook nil
   "Callbacks to be run when the IP geolocation is changed.")
 
+(defvar geo-ip-urls '("https://geoip-db.com/json/"
+		      "https://freegeoip.app/json/")
+  "A list of URLs to be used by geo-ip.")
+
 (defun geo-ip--async-retrieve-ip (callback)
   "Call CALLBACK with the current device's latitude, if it exists."
   (ignore-errors
@@ -42,12 +46,19 @@
     (async-start `(lambda ()
 		    (require 'url)
 		    (require 'json)
-		    (with-current-buffer (url-retrieve-synchronously "https://geoip-db.com/json/")
-		      (goto-char (point-min))
-		      (search-forward "{")
-		      (previous-line)
-		      (delete-region (point-min) (point))
-		      (json-read)))
+		    (eval '(letrec ((l (lambda (urls)
+					 (condition-case nil
+					     (progn
+					       (with-current-buffer (url-retrieve-synchronously
+								     (car urls))
+						 (goto-char (point-min))
+						 (search-forward "{")
+						 (previous-line)
+						 (delete-region (point-min) (point))
+						 (json-read)))
+					   (error (when (cdr urls)
+						    (funcall l (cdr urls))))))))
+			     (funcall l ',geo-ip-urls)) t))
 		 (lambda (item)
 		   (let ((lat (cdr-safe (assq 'latitude item)))
 			 (lon (cdr-safe (assq 'longitude item))))
@@ -72,7 +83,7 @@
 (defun geo-ip--subscribe (fn)
   "Subscribe FN to geo-ip events."
   (when geo-ip--last-location
-    (fn geo-ip--last-location))
+    (funcall fn geo-ip--last-location))
   (add-hook 'geo-ip--changed-hook fn))
 
 (run-with-timer 0 (* 60 2000) #'geo-ip--timer-callback)
