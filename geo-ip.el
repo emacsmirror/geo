@@ -37,7 +37,22 @@
 
 (defvar geo-ip-urls '("https://geoip-db.com/json/"
 		      "https://freegeoip.app/json/")
-  "A list of URLs to be used by geo-ip.")
+  "A list of URLs to be used by geo-ip.
+Entries can either be a string, or a pair of a URL and a quoted
+function that accept a JSON object, and return a cons pair of
+latitude and longitude.")
+
+(defun geo-ip--get-url (entry)
+  "Retrieve the URL from ENTRY."
+  (cond ((stringp entry) entry)
+	((consp entry) (car entry))))
+
+(defun geo-ip--extract-latl (entry json)
+  "Retrieve the latitude and longitude from ENTRY with JSON."
+  (if (stringp entry)
+      (cons (cdr (assq 'latitude json))
+	    (cdr (assq 'longitude json)))
+    (funcall (cdr entry) json)))
 
 (defun geo-ip--async-retrieve-ip (callback)
   "Call CALLBACK with the current device's latitude, if it exists."
@@ -50,18 +65,20 @@
 					 (condition-case nil
 					     (progn
 					       (with-current-buffer (url-retrieve-synchronously
-								     (car urls))
+								     (funcall ,(list 'quote
+										     (symbol-function #'geo-ip--get-url))
+									      (car urls)))
 						 (goto-char (point-min))
 						 (search-forward "{")
 						 (previous-line)
 						 (delete-region (point-min) (point))
-						 (json-read)))
+						 (cons (json-read) (car urls))))
 					   (error (when (cdr urls)
 						    (funcall l (cdr urls))))))))
 			     (funcall l ',geo-ip-urls)) t))
-		 (lambda (item)
-		   (let ((lat (cdr-safe (assq 'latitude item)))
-			 (lon (cdr-safe (assq 'longitude item))))
+		 (lambda (it)
+		   (pcase-let* ((`(,item . ,entry) it)
+				(`(,lat . ,lon) (geo-ip--extract-latl entry item)))
 		     (when (and lat lon
 				(numberp lat)
 				(numberp lon))
