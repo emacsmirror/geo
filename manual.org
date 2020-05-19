@@ -122,3 +122,7 @@
        A list of URLs to be used for fetching the geolocation. The URLs should take no
        arguments, and return a json object with the fields "longitude" and "latitude",
        which should be doubles.
+
+       A cons pair of the aformentioned URLs and a quoted extractor function, accepting
+       a single json.el object, and returning the latitude and longitude as a cons pair
+       is also accepted.
