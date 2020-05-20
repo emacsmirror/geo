@@ -54,6 +54,14 @@
   "A function that saves the cached value.
 It should take one argument, the value to be saved.")
 
+(defmacro geo-xdg--ignore-yes-or-no-ps (retval &rest body)
+  "Ignore `yes-or-no-p' and always return RETVAL inside BODY."
+  (declare (indent 2))
+  `(let ((old-fn (symbol-function #'yes-or-no-p)))
+     (fset 'yes-or-no-p (lambda (&rest _) ,retval))
+     (prog1 (progn ,@body)
+       (fset 'yes-or-no-p old-fn))))
+
 (cl-deftype geo-xdg--location ()
   '(satisfies geo-xdg--location-p))
 
@@ -74,26 +82,28 @@ It should take one argument, the value to be saved.")
   "Set CACHE as the cached location."
   (ignore-errors
     (save-window-excursion
-      (with-current-buffer (find-file-noselect (concat user-emacs-directory
-						       "geo-xdg-cache.el")
-					       nil nil nil)
-	(erase-buffer)
-	(print cache (current-buffer))
-	(let ((save-silently t))
-	  (save-buffer))
-	(kill-buffer)))))
+      (geo-xdg--ignore-yes-or-no-ps t
+	  (with-current-buffer (find-file-noselect (concat user-emacs-directory
+							   "geo-xdg-cache.el")
+						   nil nil nil)
+	    (erase-buffer)
+	    (print cache (current-buffer))
+	    (let ((save-silently t))
+	      (save-buffer))
+	    (kill-buffer))))))
 
 (defun geo-xdg-get-cache ()
   "Retrieve the cached location."
   (save-window-excursion
     (when (file-exists-p (concat user-emacs-directory
 				 "geo-xdg-cache.el"))
-      (with-current-buffer (find-file-noselect (concat user-emacs-directory
-						       "geo-xdg-cache.el")
-					       nil nil nil)
-	(goto-char (point-min))
-	(prog1 (read (current-buffer))
-	  (kill-buffer))))))
+      (geo-xdg--ignore-yes-or-no-ps t
+	  (with-current-buffer (find-file-noselect (concat user-emacs-directory
+							   "geo-xdg-cache.el")
+						   nil nil nil)
+	    (goto-char (point-min))
+	    (prog1 (read (current-buffer))
+	      (kill-buffer)))))))
 
 (defun geo-xdg--maybe-setup ()
   "Set up GeoClue related interfaces if necessary."
