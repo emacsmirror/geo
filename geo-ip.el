@@ -77,16 +77,17 @@ latitude and longitude.")
 						    (funcall l (cdr urls))))))))
 			     (funcall l ',geo-ip-urls)) t))
 		 (lambda (it)
-		   (pcase-let* ((`(,item . ,entry) it)
-				(`(,lat . ,lon) (geo-ip--extract-latl entry item)))
-		     (when (and lat lon
-				(numberp lat)
-				(numberp lon))
-		       (setq geo-ip--last-callback-success-p t)
-		       (let ((loc (geo-location lat lon (round (float-time)) nil)))
+		   (ignore-errors
+		     (pcase-let* ((`(,item . ,entry) it)
+				  (`(,lat . ,lon) (geo-ip--extract-latl entry item)))
+		       (when (and lat lon
+				  (numberp lat)
+				  (numberp lon))
+			 (setq geo-ip--last-callback-success-p t)
+			 (let ((loc (geo-location lat lon (round (float-time)) nil)))
 			 (when (not (equal geo-ip--last-location loc))
 			   (setq geo-ip--last-location loc)
-			   (funcall callback loc)))))))))
+			   (funcall callback loc))))))))))
 
 (defun geo-ip--timer-callback ()
   "Callback to be run from the geo-ip refresh timer."
