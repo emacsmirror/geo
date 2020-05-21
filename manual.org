@@ -32,7 +32,7 @@
       a non-nil value if the backend should be considered as containing
       potentially outdated data.
     - ~priority~ ::
-      This should be a fixnum.  The higher the fixnum is, the more priority
+      This should be a integer.  The higher the integer is, the more priority
       the backend will get.
 
 
