@@ -160,13 +160,15 @@ The returned data will be stored in the following format:
 (defun geo-xdg--dbus-callback (_ new)
   "Callback for GeoClue2's LocationUpdated signal.
 NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
-  (ignore-errors
-    (setq geo-xdg-last-location (geo-xdg--location-data new)))
-  (setq geo-xdg-restored-from-cache nil)
-  (ignore-errors
-    (funcall geo-xdg-save-cache-function geo-xdg-last-location))
-  (ignore-errors
-    (run-hook-with-args 'geo-xdg-changed-hooks geo-xdg-last-location)))
+  (let ((ld (geo-xdg--location-data new)))
+    (when (not (equal geo-xdg-last-location ld))
+      (ignore-errors
+	(setq geo-xdg-last-location ld))
+      (setq geo-xdg-restored-from-cache nil)
+      (ignore-errors
+	(funcall geo-xdg-save-cache-function geo-xdg-last-location))
+      (ignore-errors
+	(run-hook-with-args 'geo-xdg-changed-hooks geo-xdg-last-location)))))
 
 (defun geo-xdg--register-signals ()
   "Register the LocationUpdated signal for the current GeoClue client."
