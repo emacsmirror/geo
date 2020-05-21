@@ -126,3 +126,10 @@
        A cons pair of the aformentioned URLs and a quoted extractor function, accepting
        a single json.el object, and returning the latitude and longitude as a cons pair
        is also accepted.
+
+* geo-fallback
+  ~geo-fallback~ is a fallback geo.backend location provider, which always provides
+  a fixed location to geo.el.
+
+  To customize the location stored inside ~geo-fallback~, set the variables
+  ~geo-fallback-lat~, ~geo-fallback-lon~, and call ~geo-fallback-notify-changed~.
