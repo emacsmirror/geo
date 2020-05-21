@@ -104,7 +104,7 @@ latitude and longitude.")
     (funcall fn geo-ip--last-location))
   (add-hook 'geo-ip--changed-hook fn))
 
-(run-with-timer 0 (* 60 2000) #'geo-ip--timer-callback)
+(run-with-timer 0 (* 60 60) #'geo-ip--timer-callback)
 
 (geo-enable-backend #'geo-ip--subscribe
 		    #'geo-ip--last-ip-invalid-p 2)
