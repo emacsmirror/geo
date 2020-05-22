@@ -52,8 +52,10 @@
 LOCATION should be a `geo--location',
 and BACKEND should be the geo.el backend."
   (when location
-    (setf (alist-get backend geo--backend-slots nil nil #'equal) location)
-    (run-hook-with-args 'geo-data-changed-hook (geo--sort-slots))))
+    (let ((ll (geo-last-location)))
+      (setf (alist-get backend geo--backend-slots nil nil #'equal) location)
+      (when (not (equal ll (geo--sort-slots)))
+	(run-hook-with-args 'geo-data-changed-hook (geo--sort-slots))))))
 
 (defun geo--backend-register-function (backend fn)
   "Register a single function FN to be called when BACKEND's location is changed."
