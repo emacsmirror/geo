@@ -129,6 +129,11 @@ It should take one argument, the value to be saved.")
   "Return the longitude stored inside LOC."
   (cdr (geo-xdg-location-lat-long loc)))
 
+(defun geo-xdg--regularize-altitude (alt)
+  "Regularize the altitude ALT.
+If ALT is `-1.7976931348623157e+308', nil will be returned."
+  (when (not (equal alt -1.7976931348623157e+308)) alt))
+
 (defun geo-xdg--location-data (loc)
   "Return the data stored inside LOC.
 The returned data will be stored in the following format:
@@ -144,9 +149,9 @@ The returned data will be stored in the following format:
     (lon . ,(dbus-get-property :system "org.freedesktop.GeoClue2"
 			       loc "org.freedesktop.GeoClue2.Location"
 			       "Longitude"))
-    (alt . ,(dbus-get-property :system "org.freedesktop.GeoClue2"
-			       loc "org.freedesktop.GeoClue2.Location"
-			       "Altitude"))
+    (alt . ,(geo-xdg--regularize-altitude (dbus-get-property :system "org.freedesktop.GeoClue2"
+							     loc "org.freedesktop.GeoClue2.Location"
+							     "Altitude")))
     (speed . ,(dbus-get-property :system "org.freedesktop.GeoClue2"
 				 loc "org.freedesktop.GeoClue2.Location"
 				 "Speed"))
