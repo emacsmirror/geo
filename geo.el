@@ -111,6 +111,10 @@ Additional data can be stored inside REST."
   "Return LOC's longitude."
   (cdr (assq 'lon loc)))
 
+(defun geo-location-altitude (loc)
+  "Return LOC's altitude, if it exists."
+  (cdr-safe (assq 'alt (cdr loc))))
+
 (defun geo-last-location ()
   "Return the last known location from geo.el."
   (geo--sort-slots))
