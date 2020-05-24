@@ -141,7 +141,9 @@ The returned data will be stored in the following format:
    (lon . longitude)
    (alt . altitude)
    (speed . speed)
-   (description . description))"
+   (accuracy . accuracy)
+   (description . description)
+   (dt . date-time))"
   (cl-check-type loc geo-xdg--location)
   `((lat . ,(dbus-get-property :system "org.freedesktop.GeoClue2"
 			       loc "org.freedesktop.GeoClue2.Location"
@@ -155,6 +157,9 @@ The returned data will be stored in the following format:
     (speed . ,(dbus-get-property :system "org.freedesktop.GeoClue2"
 				 loc "org.freedesktop.GeoClue2.Location"
 				 "Speed"))
+    (accuracy . ,(dbus-get-property :system "org.freedesktop.GeoClue2"
+				    loc "org.freedesktop.GeoClue2.Location"
+				    "Accuracy"))
     (description . ,(dbus-get-property :system "org.freedesktop.GeoClue2"
 				       loc "org.freedesktop.GeoClue2.Location"
 				       "Description"))
