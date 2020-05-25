@@ -143,7 +143,6 @@ CB will be called with the data as a string."
        `(lambda ()
 	  (require 'url)
 	  (require 'json)
-	  (ignore-errors)
 	  (let ((url-http-data (json-encode
 				,(list 'quote
 				       `((wifiAccessPoints . ,(mapcar #'geo-nm--json-data
