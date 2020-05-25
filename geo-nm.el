@@ -49,6 +49,21 @@
 		      "org.freedesktop.NetworkManager"
 		      "state")))
 
+(defun geo-nm--ap-callback (&rest _)
+  "Callback to be run on AP list change."
+  (geo-nm--timer-callback))
+
+(defun geo-nm--device-added-cb (device)
+  "Callback that will be called when a NetworkManager device has been added.
+DEVICE should be an object path leading to DEVICE."
+  (when (eq (geo-nm--device-type device) 2)
+    (dbus-register-signal :system "org.freedesktop.NetworkManager"
+			  device "org.freedesktop.NetworkManager.Device.Wireless"
+			  "AccessPointAdded" #'geo-nm--ap-callback)
+    (dbus-register-signal :system "org.freedesktop.NetworkManager"
+			  device "org.freedesktop.NetworkManager.Device.Wireless"
+			  "AccessPointRemoved" #'geo-nm--ap-callback)))
+
 (defun geo-nm--ap-properties (ap)
   "Return the properties of the access point AP, as an alist."
   (mapcar (lambda (i)
@@ -60,9 +75,10 @@
 
 (defun geo-nm--device-type (dev)
   "Return the device type from DEV."
-  (dbus-get-property :system "org.freedesktop.NetworkManager"
-		     dev "org.freedesktop.NetworkManager.Device"
-		     "DeviceType"))
+  (ignore-errors
+    (dbus-get-property :system "org.freedesktop.NetworkManager"
+		       dev "org.freedesktop.NetworkManager.Device"
+		       "DeviceType")))
 
 (defun geo-nm--get-devices ()
   "Return a list of valid devices from NetworkManager."
@@ -175,10 +191,19 @@ CB will be called with the data as a string."
   (setq geo-nm--last-call-successful-p nil)
   (geo-nm--async-fetch-json #'geo-nm--moz-callback))
 
-(run-with-timer 0 60 #'geo-nm--timer-callback)
+(run-with-timer 0 nil #'geo-nm--timer-callback)
 
 (geo-enable-backend #'geo-nm--subscribe
 		    #'geo-nm--data-invalid-p 2)
+
+(dbus-register-signal :system
+		      "org.freedesktop.NetworkManager"
+		      "/org/freedesktop/NetworkManager"
+		      "org.freedesktop.NetworkManager"
+		      "DeviceAdded"
+		      #'geo-nm--device-added-cb)
+
+(mapc #'geo-nm--device-added-cb (geo-nm--get-devices))
 
 (provide 'geo-nm)
 
