@@ -108,13 +108,15 @@
 (defun geo-nm--moz-callback (data)
   "Callback for `geo-nm--async-fetch-json'.
 DATA should be the returned JSON data."
-  (let ((l geo-nm-last-result))
-    (setq geo-nm-last-result
-	  (list (assq 'lat (cdar data))
-		(cons 'lon (cdr (assq 'lng (cdar data))))
-		(cons 'dt (round (float-time)))))
-    (unless (equal l geo-nm-last-result)
-      (run-hook-with-args 'geo-nm-changed-hook geo-nm-last-result))))
+  (ignore-errors
+    (let ((l geo-nm-last-result))
+      (setq geo-nm-last-result
+	    (list (assq 'lat (cdar data))
+		  (cons 'lon (cdr (assq 'lng (cdar data))))
+		  (cons 'dt (round (float-time)))))
+      (setq geo-nm--last-call-successful-p t)
+      (unless (equal l geo-nm-last-result)
+	(run-hook-with-args 'geo-nm-changed-hook geo-nm-last-result)))))
 
 (defun geo-nm--strength-to-dbm (strength)
   "Convert STRENGTH, an integer between 0 and 100 to dBm."
@@ -169,6 +171,7 @@ CB will be called with the data as a string."
 
 (defun geo-nm--timer-callback ()
   "Timer callback for the geo-nm refresh timer."
+  (setq geo-nm--last-call-successful-p nil)
   (geo-nm--async-fetch-json #'geo-nm--moz-callback))
 
 (run-with-timer 0 60 #'geo-nm--timer-callback)
