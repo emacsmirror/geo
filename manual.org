@@ -130,8 +130,34 @@
        is also accepted.
 
 * geo-fallback
-  ~geo-fallback~ is a fallback geo.backend location provider, which always provides
+  ~geo-fallback~ is a fallback geo.el backend location provider, which always provides
   a fixed location to geo.el.
 
   To customize the location stored inside ~geo-fallback~, set the variables
   ~geo-fallback-lat~, ~geo-fallback-lon~, and call ~geo-fallback-notify-changed~.
+
+* geo-nm
+  ~geo-nm~ is a geo.el backend that uses the XDG NetworkManager API
+  and the Mozilla Location Service to provide Wi-Fi AP based network
+  geolocation to geo.el.
+
+  It can also be used as an independent library, though it will still
+  depend on geo.el.  You are recommended to use that instead.
+
+** Use as a geo.el backend
+   To use geo-nm as a geo.el backend, simply put:
+#+begin_src elisp
+(require 'geo-nm)
+#+end_src
+   In your initialization files.
+
+** Use as an independent library
+   The primary entry point for using geo-nm is the hook ~geo-nm-changed-hook~,
+   which accepts a single argument containing a geo.el location.
+
+   You can also use the ~geo-nm-last-result~ variable, which contains
+   the last retrieved location, or nil if none exists.
+
+** User customization
+   You can customize the ~geo-nm-moz-key~ variable to set the MLS API key.
+   It defaults to the string ~geoclue~.
