@@ -119,26 +119,27 @@ DATA should be the returned JSON data."
 (defun geo-nm--async-fetch-json (cb)
   "Fetch the raw json data from Mozilla's GeoClue API asynchronously.
 CB will be called with the data as a string."
-  (ignore-errors
-    (async-start
-     `(lambda ()
-	(require 'url)
-	(require 'json)
-	(ignore-errors)
-	(let ((url-http-data (json-encode
-			      ,(list 'quote
-				     `((wifiAccessPoints . ,(mapcar (lambda (maddr)
-								      `((macAddress . ,maddr)))
-								    (geo-nm--get-hwaddrs)))))))
-	      (url-http-method "POST"))
-	  (with-current-buffer (url-retrieve-synchronously
-				(format "https://location.services.mozilla.com/v1/geolocate?key=%s"
-					,geo-nm-moz-key))
-	    (goto-char (point-min))
-	    (search-forward "{")
-	    (previous-line)
-	    (delete-region (point-min) (point))
-	    (json-read)))) cb)))
+  (when (geo-nm--nm-available-p)
+    (ignore-errors
+      (async-start
+       `(lambda ()
+	  (require 'url)
+	  (require 'json)
+	  (ignore-errors)
+	  (let ((url-http-data (json-encode
+				,(list 'quote
+				       `((wifiAccessPoints . ,(mapcar (lambda (maddr)
+									`((macAddress . ,maddr)))
+								      (geo-nm--get-hwaddrs)))))))
+		(url-http-method "POST"))
+	    (with-current-buffer (url-retrieve-synchronously
+				  (format "https://location.services.mozilla.com/v1/geolocate?key=%s"
+					  ,geo-nm-moz-key))
+	      (goto-char (point-min))
+	      (search-forward "{")
+	      (previous-line)
+	      (delete-region (point-min) (point))
+	      (json-read)))) cb))))
 
 (defun geo-nm--subscribe (cb)
   "Subscribe CB as a change listener."
