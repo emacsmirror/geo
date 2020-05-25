@@ -115,7 +115,8 @@ DATA should be the returned JSON data."
 		  (cons 'lon (cdr (assq 'lng (cdar data))))
 		  (cons 'dt (round (float-time)))))
       (setq geo-nm--last-call-successful-p t)
-      (unless (equal l geo-nm-last-result)
+      (unless (equal (subseq l 0 2)
+		     (subseq geo-nm-last-result 0 2))
 	(run-hook-with-args 'geo-nm-changed-hook geo-nm-last-result)))))
 
 (defun geo-nm--strength-to-dbm (strength)
