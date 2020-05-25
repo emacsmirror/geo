@@ -116,6 +116,24 @@ DATA should be the returned JSON data."
     (unless (equal l geo-nm-last-result)
       (run-hook-with-args 'geo-nm-changed-hook geo-nm-last-result))))
 
+(defun geo-nm--strength-to-dbm (strength)
+  "Convert STRENGTH, an integer between 0 and 100 to dBm."
+  (- (/ strength 2) 100))
+
+(defun geo-nm--ap-dbm (ap)
+  "Return the dBm value of the access point AP."
+  (geo-nm--strength-to-dbm (cdr (assq 'strength ap))))
+
+(defun geo-nm--ap-frequency (ap)
+  "Return the frequency in use by the access point AP."
+  (cdr (assq 'frequency ap)))
+
+(defun geo-nm--json-data (ap)
+  "Encode the access point AP into JSON data for the MLS API."
+  `((macAddress . ,(geo-nm--ap-hwaddr ap))
+    (frequency . ,(geo-nm--ap-frequency ap))
+    (signalStrength . ,(geo-nm--ap-frequency ap))))
+
 (defun geo-nm--async-fetch-json (cb)
   "Fetch the raw json data from Mozilla's GeoClue API asynchronously.
 CB will be called with the data as a string."
@@ -128,9 +146,8 @@ CB will be called with the data as a string."
 	  (ignore-errors)
 	  (let ((url-http-data (json-encode
 				,(list 'quote
-				       `((wifiAccessPoints . ,(mapcar (lambda (maddr)
-									`((macAddress . ,maddr)))
-								      (geo-nm--get-hwaddrs)))))))
+				       `((wifiAccessPoints . ,(mapcar #'geo-nm--json-data
+								      (geo-nm--get-aps)))))))
 		(url-http-method "POST"))
 	    (with-current-buffer (url-retrieve-synchronously
 				  (format "https://location.services.mozilla.com/v1/geolocate?key=%s"
