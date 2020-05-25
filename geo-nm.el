@@ -41,6 +41,15 @@
 (defvar geo-nm--last-call-successful-p nil
   "Whether or not the last API request was successful.")
 
+(defvar geo-nm--last-call nil
+  "The last call to async.el.")
+
+(defvar geo-nm-delay 25.0
+  "The minimum time (in seconds) between geo-nm refreshes.")
+
+(defvar geo-nm--last-call-time nil
+  "The time of the last geo-nm refresh.")
+
 (defun geo-nm--nm-available-p ()
   "Return non-nil if NetworkManager is available."
   (ignore-errors
@@ -124,6 +133,7 @@ DEVICE should be an object path leading to DEVICE."
 (defun geo-nm--moz-callback (data)
   "Callback for `geo-nm--async-fetch-json'.
 DATA should be the returned JSON data."
+  (setq geo-nm--last-call-time (float-time))
   (ignore-errors
     (let ((l geo-nm-last-result))
       (setq geo-nm-last-result
@@ -158,23 +168,24 @@ DATA should be the returned JSON data."
 CB will be called with the data as a string."
   (when (geo-nm--nm-available-p)
     (ignore-errors
-      (async-start
-       `(lambda ()
-	  (require 'url)
-	  (require 'json)
-	  (let ((url-http-data (json-encode
-				,(list 'quote
-				       `((wifiAccessPoints . ,(mapcar #'geo-nm--json-data
-								      (geo-nm--get-aps)))))))
-		(url-http-method "POST"))
-	    (with-current-buffer (url-retrieve-synchronously
-				  (format "https://location.services.mozilla.com/v1/geolocate?key=%s"
-					  ,geo-nm-moz-key))
-	      (goto-char (point-min))
-	      (search-forward "{")
-	      (previous-line)
-	      (delete-region (point-min) (point))
-	      (json-read)))) cb))))
+      (setq geo-nm--last-call
+	    (async-start
+	     `(lambda ()
+		(require 'url)
+		(require 'json)
+		(let ((url-http-data (json-encode
+				      ,(list 'quote
+					     `((wifiAccessPoints . ,(mapcar #'geo-nm--json-data
+									    (geo-nm--get-aps)))))))
+		      (url-http-method "POST"))
+		  (with-current-buffer (url-retrieve-synchronously
+					(format "https://location.services.mozilla.com/v1/geolocate?key=%s"
+						,geo-nm-moz-key))
+		    (goto-char (point-min))
+		    (search-forward "{")
+		    (previous-line)
+		    (delete-region (point-min) (point))
+		    (json-read)))) cb)))))
 
 (defun geo-nm--subscribe (cb)
   "Subscribe CB as a change listener."
@@ -189,7 +200,13 @@ CB will be called with the data as a string."
 (defun geo-nm--timer-callback ()
   "Timer callback for the geo-nm refresh timer."
   (setq geo-nm--last-call-successful-p nil)
-  (geo-nm--async-fetch-json #'geo-nm--moz-callback))
+  (unless (and geo-nm--last-call
+	       (process-live-p geo-nm--last-call)
+	       (not (and geo-nm--last-call-time
+			 (< (- geo-nm--last-call-time
+			       (float-time))
+			    geo-nm-delay))))
+    (geo-nm--async-fetch-json #'geo-nm--moz-callback)))
 
 (run-with-timer 0 nil #'geo-nm--timer-callback)
 
