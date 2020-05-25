@@ -25,6 +25,7 @@
 ;;; Code:
 
 (require 'geo)
+(require 'async)
 
 (defvar geo-ip--last-callback-success-p nil
   "Whether or not the last callback was successful.")
@@ -107,7 +108,7 @@ latitude and longitude.")
 (run-with-timer 0 (* 60 60) #'geo-ip--timer-callback)
 
 (geo-enable-backend #'geo-ip--subscribe
-		    #'geo-ip--last-ip-invalid-p 2)
+		    #'geo-ip--last-ip-invalid-p 1)
 
 (provide 'geo-ip)
 ;;; geo-ip.el ends here
