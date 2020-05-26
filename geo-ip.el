@@ -43,6 +43,9 @@ Entries can either be a string, or a pair of a URL and a quoted
 function that accept a JSON object, and return a cons pair of
 latitude and longitude.")
 
+(defvar geo-ip--last-process nil
+  "The last process launched by geo-ip.")
+
 (defun geo-ip--get-url (entry)
   "Retrieve the URL from ENTRY."
   (cond ((stringp entry) entry)
@@ -59,41 +62,44 @@ latitude and longitude.")
   "Call CALLBACK with the current device's latitude, if it exists."
   (ignore-errors
     (setq geo-ip--last-callback-success-p nil)
-    (async-start `(lambda ()
-		    (require 'url)
-		    (require 'json)
-		    (eval '(letrec ((l (lambda (urls)
-					 (condition-case nil
-					     (progn
-					       (with-current-buffer (url-retrieve-synchronously
-								     (funcall ,(list 'quote
-										     (symbol-function #'geo-ip--get-url))
-									      (car urls)))
-						 (goto-char (point-min))
-						 (search-forward "{")
-						 (previous-line)
-						 (delete-region (point-min) (point))
-						 (cons (json-read) (car urls))))
-					   (error (when (cdr urls)
-						    (funcall l (cdr urls))))))))
-			     (funcall l ',geo-ip-urls)) t))
-		 (lambda (it)
-		   (ignore-errors
-		     (pcase-let* ((`(,item . ,entry) it)
-				  (`(,lat . ,lon) (geo-ip--extract-latl entry item)))
-		       (when (and lat lon
-				  (numberp lat)
-				  (numberp lon))
-			 (setq geo-ip--last-callback-success-p t)
-			 (let ((loc (geo-location lat lon (round (float-time)) nil)))
-			 (when (not (equal geo-ip--last-location loc))
-			   (setq geo-ip--last-location loc)
-			   (funcall callback loc))))))))))
+    (setq geo-ip--last-process
+	  (async-start `(lambda ()
+			  (require 'url)
+			  (require 'json)
+			  (eval '(letrec ((l (lambda (urls)
+					       (condition-case nil
+						   (progn
+						     (with-current-buffer (url-retrieve-synchronously
+									   (funcall ,(list 'quote
+											   (symbol-function #'geo-ip--get-url))
+										    (car urls)))
+						       (goto-char (point-min))
+						       (search-forward "{")
+						       (previous-line)
+						       (delete-region (point-min) (point))
+						       (cons (json-read) (car urls))))
+						 (error (when (cdr urls)
+							  (funcall l (cdr urls))))))))
+				   (funcall l ',geo-ip-urls)) t))
+		       (lambda (it)
+			 (ignore-errors
+			   (pcase-let* ((`(,item . ,entry) it)
+					(`(,lat . ,lon) (geo-ip--extract-latl entry item)))
+			     (when (and lat lon
+					(numberp lat)
+					(numberp lon))
+			       (setq geo-ip--last-callback-success-p t)
+			       (let ((loc (geo-location lat lon (round (float-time)) nil)))
+				 (when (not (equal geo-ip--last-location loc))
+				   (setq geo-ip--last-location loc)
+				   (funcall callback loc)))))))))))
 
 (defun geo-ip--timer-callback ()
   "Callback to be run from the geo-ip refresh timer."
-  (geo-ip--async-retrieve-ip (lambda (location)
-			       (run-hook-with-args 'geo-ip--changed-hook location))))
+  (unless (and geo-ip--last-process
+	       (process-live-p geo-ip--last-process))
+    (geo-ip--async-retrieve-ip (lambda (location)
+				 (run-hook-with-args 'geo-ip--changed-hook location)))))
 
 (defun geo-ip--last-ip-invalid-p ()
   "Whether or not the last call was unsuccessful."
