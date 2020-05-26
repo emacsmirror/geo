@@ -158,11 +158,16 @@ DATA should be the returned JSON data."
   "Return the frequency in use by the access point AP."
   (cdr (assq 'frequency ap)))
 
+(defun geo-nm--ap-age (ap)
+  "Return the amount of milliseconds since AP was last seen."
+  (cdr (assq 'lastseen ap)))
+
 (defun geo-nm--json-data (ap)
   "Encode the access point AP into JSON data for the MLS API."
   `((macAddress . ,(geo-nm--ap-hwaddr ap))
     (frequency . ,(geo-nm--ap-frequency ap))
-    (signalStrength . ,(geo-nm--ap-dbm ap))))
+    (signalStrength . ,(geo-nm--ap-dbm ap))
+    (age . ,(geo-nm--ap-age ap))))
 
 (defun geo-nm--nomap-p (ap)
   "Return whether AP should be ignored in requests."
