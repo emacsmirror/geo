@@ -189,14 +189,15 @@ CB will be called with the data as a string."
 					     `((wifiAccessPoints . ,(mapcar #'geo-nm--json-data
 									    (geo-nm--get-aps)))))))
 		      (url-http-method "POST"))
-		  (with-current-buffer (url-retrieve-synchronously
-					(format "https://location.services.mozilla.com/v1/geolocate?key=%s"
-						,geo-nm-moz-key))
-		    (goto-char (point-min))
-		    (search-forward "{")
-		    (previous-line)
-		    (delete-region (point-min) (point))
-		    (json-read)))) cb)))))
+		  (ignore-errors
+		    (with-current-buffer (url-retrieve-synchronously
+					  (format "https://location.services.mozilla.com/v1/geolocate?key=%s"
+						  ,geo-nm-moz-key))
+		      (goto-char (point-min))
+		      (search-forward "{")
+		      (previous-line)
+		      (delete-region (point-min) (point))
+		      (json-read))))) cb)))))
 
 (defun geo-nm--subscribe (cb)
   "Subscribe CB as a change listener."
