@@ -212,12 +212,12 @@ CB will be called with the data as a string."
 (defun geo-nm--timer-callback ()
   "Timer callback for the geo-nm refresh timer."
   (setq geo-nm--last-call-successful-p nil)
-  (unless (and geo-nm--last-call
-	       (process-live-p geo-nm--last-call)
-	       (not (and geo-nm--last-call-time
-			 (< (- geo-nm--last-call-time
-			       (float-time))
-			    geo-nm-delay))))
+  (unless (or (and geo-nm--last-call
+		   (process-live-p geo-nm--last-call))
+	      (and geo-nm--last-call-time
+		   (< (- (float-time)
+			 geo-nm--last-call-time)
+		      geo-nm-delay)))
     (geo-nm--async-fetch-json #'geo-nm--moz-callback)))
 
 (run-with-timer 0 nil #'geo-nm--timer-callback)
