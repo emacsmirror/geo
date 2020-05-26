@@ -26,6 +26,7 @@
 
 (require 'dbus)
 (require 'cl-lib)
+(require 'geo)
 
 (declare-function geo-enable-backend "geo.el")
 
@@ -269,10 +270,8 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
   (add-hook 'geo-xdg-changed-hooks fn)
   (run-hook-with-args 'geo-xdg-changed-hooks geo-xdg-last-location))
 
-(eval-after-load "geo"
-  (lambda ()
-    (geo-enable-backend #'geo-xdg--geo-register
-			#'geo-xdg--data-outdated-p 3)))
+(geo-enable-backend #'geo-xdg--geo-register
+		    #'geo-xdg--data-outdated-p 3)
 
 (provide 'geo-xdg)
 ;;; geo-xdg.el ends here
