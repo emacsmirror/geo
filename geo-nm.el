@@ -161,7 +161,7 @@ DATA should be the returned JSON data."
   "Encode the access point AP into JSON data for the MLS API."
   `((macAddress . ,(geo-nm--ap-hwaddr ap))
     (frequency . ,(geo-nm--ap-frequency ap))
-    (signalStrength . ,(geo-nm--ap-frequency ap))))
+    (signalStrength . ,(geo-nm--ap-dbm ap))))
 
 (defun geo-nm--async-fetch-json (cb)
   "Fetch the raw json data from Mozilla's GeoClue API asynchronously.
