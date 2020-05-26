@@ -159,5 +159,8 @@
    the last retrieved location, or nil if none exists.
 
 ** User customization
-   You can customize the ~geo-nm-moz-key~ variable to set the MLS API key.
-   It defaults to the string ~geoclue~.
+   geo-nm can be customized via the following variables:
+    - ~geo-nm-moz-key~ ::
+      You can customize the ~geo-nm-moz-key~ variable to set the MLS API key.
+      It defaults to the string ~geoclue~.
+    - ~geo-nm-delay~ :: The minimum amount of time between refreshes.
