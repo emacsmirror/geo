@@ -50,6 +50,9 @@
 (defvar geo-nm--last-call-time nil
   "The time of the last geo-nm refresh.")
 
+(defvar geo-nm--kill nil
+  "Fix to prevent dbus signals from being delivered while executing timer code.")
+
 (defun geo-nm--nm-available-p ()
   "Return non-nil if NetworkManager is available."
   (ignore-errors
@@ -216,13 +219,15 @@ CB will be called with the data as a string."
 (defun geo-nm--timer-callback ()
   "Timer callback for the geo-nm refresh timer."
   (setq geo-nm--last-call-successful-p nil)
-  (unless (or (and geo-nm--last-call
-		   (process-live-p geo-nm--last-call))
-	      (and geo-nm--last-call-time
-		   (< (- (float-time)
-			 geo-nm--last-call-time)
-		      geo-nm-delay)))
-    (geo-nm--async-fetch-json #'geo-nm--moz-callback)))
+  (unless geo-nm--kill
+    (let ((geo-nm--kill t))
+      (unless (or (and geo-nm--last-call
+		       (process-live-p geo-nm--last-call))
+		  (and geo-nm--last-call-time
+		       (< (- (float-time)
+			     geo-nm--last-call-time)
+			  geo-nm-delay)))
+	(geo-nm--async-fetch-json #'geo-nm--moz-callback)))))
 
 (run-with-timer 0 nil #'geo-nm--timer-callback)
 
