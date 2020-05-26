@@ -55,13 +55,13 @@
   "A function that saves the cached value.
 It should take one argument, the value to be saved.")
 
-(defmacro geo-xdg--ignore-yes-or-no-ps (retval &rest body)
+(defmacro geo-xdg--suppress-userlock (retval &rest body)
   "Ignore `yes-or-no-p' and always return RETVAL inside BODY."
   (declare (indent 2))
-  `(let ((old-fn (symbol-function #'yes-or-no-p)))
-     (fset 'yes-or-no-p (lambda (&rest _) ,retval))
+  `(let ((old-fn (symbol-function #'userlock--check-content-unchanged)))
+     (fset 'userlock--check-content-unchanged (lambda (&rest _) ,retval))
      (unwind-protect (progn ,@body)
-       (fset 'yes-or-no-p old-fn))))
+       (fset 'userlock--check-content-unchanged old-fn))))
 
 (cl-deftype geo-xdg--location ()
   '(satisfies geo-xdg--location-p))
@@ -83,7 +83,7 @@ It should take one argument, the value to be saved.")
   "Set CACHE as the cached location."
   (ignore-errors
     (save-window-excursion
-      (geo-xdg--ignore-yes-or-no-ps t
+      (geo-xdg--suppress-userlock t
 	  (with-current-buffer (find-file-noselect (concat user-emacs-directory
 							   "geo-xdg-cache.el")
 						   nil nil nil)
@@ -98,7 +98,7 @@ It should take one argument, the value to be saved.")
   (save-window-excursion
     (when (file-exists-p (concat user-emacs-directory
 				 "geo-xdg-cache.el"))
-      (geo-xdg--ignore-yes-or-no-ps t
+      (geo-xdg--suppress-userlock t
 	  (with-current-buffer (find-file-noselect (concat user-emacs-directory
 							   "geo-xdg-cache.el")
 						   nil nil nil)
