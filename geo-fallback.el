@@ -20,6 +20,8 @@
 ;;; Commentary:
 ;; A fallback Geo provider that accepts a fixed lat and lon.
 
+;;; Code:
+
 (require 'geo)
 
 (defvar geo-fallback-lat 0.0
@@ -49,6 +51,9 @@
 
 (geo-enable-backend #'geo-fallback--subscribe
 		    #'geo-fallback--outdated-p 0)
+
+(add-variable-watcher 'geo-fallback-lat #'geo-fallback-notify-changed)
+(add-variable-watcher 'geo-fallback-lon #'geo-fallback-notify-changed)
 
 (provide 'geo-fallback)
 ;;; geo-fallback.el ends here

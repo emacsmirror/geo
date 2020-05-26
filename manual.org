@@ -134,7 +134,7 @@
   a fixed location to geo.el.
 
   To customize the location stored inside ~geo-fallback~, set the variables
-  ~geo-fallback-lat~, ~geo-fallback-lon~, and call ~geo-fallback-notify-changed~.
+  ~geo-fallback-lat~, ~geo-fallback-lon~.
 
 * geo-nm
   ~geo-nm~ is a geo.el backend that uses the XDG NetworkManager API
