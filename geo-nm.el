@@ -177,7 +177,11 @@ DATA should be the returned JSON data."
 (defun geo-nm--async-fetch-json (cb)
   "Fetch the raw json data from Mozilla's GeoClue API asynchronously.
 CB will be called with the data as a string."
-  (when (geo-nm--nm-available-p)
+  (when (and (geo-nm--nm-available-p)
+	     (not (and geo-nm--last-call-time
+		       (< (- (float-time)
+			     geo-nm--last-call-time)
+			  geo-nm-delay))))
     (ignore-errors
       (setq geo-nm--last-call
 	    (async-start
