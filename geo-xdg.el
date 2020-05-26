@@ -60,7 +60,7 @@ It should take one argument, the value to be saved.")
   (declare (indent 2))
   `(let ((old-fn (symbol-function #'yes-or-no-p)))
      (fset 'yes-or-no-p (lambda (&rest _) ,retval))
-     (prog1 (progn ,@body)
+     (unwind-protect (progn ,@body)
        (fset 'yes-or-no-p old-fn))))
 
 (cl-deftype geo-xdg--location ()
