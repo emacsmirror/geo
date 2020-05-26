@@ -118,9 +118,10 @@ DEVICE should be an object path leading to DEVICE."
 (defun geo-nm--get-aps ()
   "Return a list of access points from NetworkManager."
   (let ((devices (geo-nm--get-devices)))
-    (mapcar #'geo-nm--ap-properties
-	    (cl-reduce #'append
-		       (mapcar #'geo-nm--wireless-device-aps devices)))))
+    (remove-if #'geo-nm--nomap-p
+	       (mapcar #'geo-nm--ap-properties
+		       (cl-reduce #'append
+				  (mapcar #'geo-nm--wireless-device-aps devices))))))
 
 (defun geo-nm--get-ssids ()
   "Return a list of SSIDs from NetworkManager."
@@ -162,6 +163,11 @@ DATA should be the returned JSON data."
   `((macAddress . ,(geo-nm--ap-hwaddr ap))
     (frequency . ,(geo-nm--ap-frequency ap))
     (signalStrength . ,(geo-nm--ap-dbm ap))))
+
+(defun geo-nm--nomap-p (ap)
+  "Return whether AP should be ignored in requests."
+  (and (stringp (geo-nm--ap-ssid ap))
+       (string-suffix-p "_nomap" (geo-nm--ap-ssid ap))))
 
 (defun geo-nm--async-fetch-json (cb)
   "Fetch the raw json data from Mozilla's GeoClue API asynchronously.
