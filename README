@@ -1,6 +1,7 @@
 -*- mode: outline -*-
 
-This directory tree holds 3 Emacs packages:
+This directory tree holds several Emacs packages, usually
+related to location information:
  - The geo-xdg Lisp library.
  - The geo Lisp library.
  - The geo-solar Lisp package.
@@ -22,3 +23,8 @@ to detect the current location.
 * geo-nm.el
 `geo-nm' provides a geo.el backend that uses NetworkManager and the Mozilla
 Location Service to provide location data.
+
+* geo-solar.el
+`geo-solar' is a package that sets `calendar-longitude' and `calendar-latitude'
+by the current location provided by `geo.el'.  It is useful when using packages
+that use `solar.el' instead of `geo.el' to provide location information 
