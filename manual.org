@@ -13,6 +13,13 @@
     - ~lon~ :: The longitude of the location.
     - ~dt~ :: The time the location was recorded, in epoch seconds.
 
+  There are also several optional fields that may or may not exist in locations:
+    - ~accuracy~ ::
+      The distance (in metres) around the location the actual location is within 
+      at a 95% confidence.
+    - ~speed~ :: The speed at which the device is currently traveling, in metres/second.
+    - ~alt~ :: The altitude of the device or location in metres.
+
   Several convenience functions are provided for retrieving location fields:
     - ~geo-location-lat~ :: Returns the latitude of the location
     - ~geo-location-lon~ :: Returns the longitude of the location
