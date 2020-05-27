@@ -170,7 +170,8 @@ DATA should be the returned JSON data."
   `((macAddress . ,(geo-nm--ap-hwaddr ap))
     (frequency . ,(geo-nm--ap-frequency ap))
     (signalStrength . ,(geo-nm--ap-dbm ap))
-    (age . ,(geo-nm--ap-age ap))))
+    (age . ,(geo-nm--ap-age ap))
+    (ssid . ,(geo-nm--ap-ssid ap))))
 
 (defun geo-nm--nomap-p (ap)
   "Return whether AP should be ignored in requests."
