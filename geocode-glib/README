@@ -1,0 +1,29 @@
+-*- mode: text; -*-
+
+Copyright (c) 2020 Would (oldosfan).
+See the end of the file for license conditions.
+
+
+This directory tree holds version 1.0 of geocode-emacs, an Emacs module
+providing geocoding functionality using the geocode-glib C library.
+
+The file INSTALL says how to build and install geocode-emacs on various
+systems, once you have unpacked or checked out the geocode-emacs file
+tree.
+
+See the file NEWS for information on new features and other
+user-visible changes in recent releases of geocode-emacs.
+
+The file PROBLEMS contains information on many common problems that
+occur in building, installing and running geocode-emacs.
+
+The file CONTRIBUTE contains information on contributing to
+geocode-emacs as a developer.
+
+You may encounter bugs in this release.  If you do, please report
+them; your bug reports are valuable contributions to geocode-emacs,
+since they allow me to notice and fix problems on machines I don't
+have, or in code I don't use often.  Please send bug reports to
+the address `2595677460@qq.com', and prefix the title with
+`geocode-glib bug:`.
+
