@@ -190,19 +190,22 @@ emacs_module_init (struct emacs_runtime *runtime)
     env->make_function (env, 3, 3, Fmake_geocode_location,
 			"Create a geocode location with LAT, \
 LON, and ACCURACY.\n\
-usage: (make-geocode-location LAT LON ACCURACY)", NULL);
+\n\
+(make-geocode-location LAT LON ACCURACY)", NULL);
 
   emacs_value geocode_location_p
     = env->make_function (env, 1, 1, Fgeocode_location_p,
 			  "Return non-nil if LOCATION is a \
 geocode location.\n\
-usage: (geocode-location-p LOCATION)", NULL);
+\n\
+(geocode-location-p LOCATION)", NULL);
 
   emacs_value resolve_geocode_place
     = env->make_function (env, 1, 1, Fresolve_geocode_place,
 			  "Resolve reverse geocode information \
 from LOCATION.\n\
-usage: (resolve-geocode-place LOCATION)", NULL);
+\n\
+(resolve-geocode-place LOCATION)", NULL);
 
   emacs_value Qmake_geocode_location
     = env->intern (env, "make-geocode-location");
