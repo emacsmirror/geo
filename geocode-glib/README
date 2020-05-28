@@ -27,3 +27,18 @@ have, or in code I don't use often.  Please send bug reports to
 the address `2595677460@qq.com', and prefix the title with
 `geocode-glib bug:`.
 
+
+This file is part of geocode-emacs.
+
+geocode-emacs is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+geocode-emacs is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with geocode-emacs.  If not, see <https://www.gnu.org/licenses/>.
