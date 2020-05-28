@@ -271,7 +271,9 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
   (run-hook-with-args 'geo-xdg-changed-hooks geo-xdg-last-location))
 
 (geo-enable-backend #'geo-xdg--geo-register
-		    #'geo-xdg--data-outdated-p 3)
+		    #'geo-xdg--data-outdated-p 3
+		    #'geo-xdg-pause
+		    #'geo-xdg-resume)
 
 (provide 'geo-xdg)
 ;;; geo-xdg.el ends here

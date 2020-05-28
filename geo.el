@@ -33,6 +33,9 @@
 (defvar geo-data-changed-hook nil
   "Hook to be run with a single argument LOCATION when the location is changed.")
 
+(defvar geo--paused-p nil
+  "Whether or not geo.el updates are paused.")
+
 (cl-deftype geo--backend ()
   '(satisfies geo--backend-p))
 
@@ -45,7 +48,11 @@
        (functionp (ignore-errors (cadr backend)))
        (ignore-errors (eq (car (func-arity (cadr backend))) 1))
        (ignore-errors (functionp (caddr backend)))
-       (ignore-errors (eq (car (func-arity (caddr backend))) 0))))
+       (ignore-errors (eq (car (func-arity (caddr backend))) 0))
+       (or (null (cadddr backend))
+	   (ignore-errors (eq (car (func-arity (cadddr backend))) 0)))
+       (or (null (car (cddddr backend)))
+	   (ignore-errors (eq (car (func-arity (car (cddddr backend)))) 0)))))
 
 (defun geo--update-handler (location backend)
   "Update handler for a geo backend.
@@ -54,7 +61,8 @@ and BACKEND should be the geo.el backend."
   (when location
     (let ((ll (geo-last-location)))
       (setf (alist-get backend geo--backend-slots nil nil #'equal) location)
-      (when (not (equal ll (geo--sort-slots)))
+      (when (and (not (equal ll (geo--sort-slots)))
+		 geo--paused-p)
 	(run-hook-with-args 'geo-data-changed-hook (geo--sort-slots))))))
 
 (defun geo--backend-register-function (backend fn)
@@ -72,6 +80,18 @@ The higher it is, the more important BACKEND is."
   "Return whether the information in BACKEND is outdated."
   (cl-check-type backend geo--backend)
   (funcall (caddr backend)))
+
+(defun geo--backend-pause-updates (backend)
+  "Pause location update events for BACKEND."
+  (cl-check-type backend geo--backend)
+  (when (cadddr backend)
+    (funcall (cadddr backend))))
+
+(defun geo--backend-resume-updates (backend)
+  "Resume location update events for BACKEND."
+  (cl-check-type backend geo--backend)
+  (when (car (cddddr backend))
+    (funcall (car (cddddr backend)))))
 
 (defun geo--sort-slots ()
   "Return the best entry in `geo--backend-slots'."
@@ -93,9 +113,13 @@ The higher it is, the more important BACKEND is."
 									 (cdr (assq 'dt (cdr i)))))))))))
       (or good-entry bad-entry))))
 
-(defun geo-enable-backend (subscribe-function outdated-p-function priority)
-  "Enable a backend with SUBSCRIBE-FUNCTION, OUTDATED-P-FUNCTION, and PRIORITY."
-  (let ((backend (list priority subscribe-function outdated-p-function)))
+(defun geo-enable-backend (subscribe-function outdated-p-function priority &optional
+					      stop-function start-function)
+  "Enable a backend with SUBSCRIBE-FUNCTION, OUTDATED-P-FUNCTION, and PRIORITY.
+STOP-FUNCTION should be a function that pauses location updates.
+START-FUNCTION should be a function that resumes location updates."
+  (let ((backend (list priority subscribe-function outdated-p-function
+		       stop-function start-function)))
     (cl-check-type backend geo--backend)
     (unless (member geo--enabled-backends backend)
       (geo--backend-register-function backend (lambda (l)
@@ -124,6 +148,18 @@ Additional data can be stored inside REST."
 (defun geo-last-location ()
   "Return the last known location from geo.el."
   (geo--sort-slots))
+
+(defun geo-pause ()
+  "Pause location refreshes from geo.el."
+  (interactive)
+  (mapc #'geo--backend-pause-updates geo--enabled-backends)
+  (setq geo--paused-p t))
+
+(defun geo-resume ()
+  "Resume location refreshes from geo.el."
+  (interactive)
+  (mapc #'geo--backend-resume-updates geo--enabled-backends)
+  (setq geo--paused-p nil))
 
 (provide 'geo)
 ;;; geo.el ends here
