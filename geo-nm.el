@@ -53,6 +53,9 @@
 (defvar geo-nm--kill nil
   "Fix to prevent dbus signals from being delivered while executing timer code.")
 
+(defvar geo-nm--paused nil
+  "Whether or not updates should be paused.")
+
 (defun geo-nm--nm-available-p ()
   "Return non-nil if NetworkManager is available."
   (ignore-errors
@@ -219,21 +222,32 @@ CB will be called with the data as a string."
 
 (defun geo-nm--timer-callback ()
   "Timer callback for the geo-nm refresh timer."
-  (setq geo-nm--last-call-successful-p nil)
-  (unless geo-nm--kill
-    (let ((geo-nm--kill t))
-      (unless (or (and geo-nm--last-call
-		       (process-live-p geo-nm--last-call))
-		  (and geo-nm--last-call-time
-		       (< (- (float-time)
-			     geo-nm--last-call-time)
-			  geo-nm-delay)))
-	(geo-nm--async-fetch-json #'geo-nm--moz-callback)))))
+  (unless geo-nm--paused
+    (setq geo-nm--last-call-successful-p nil)
+    (unless geo-nm--kill
+      (let ((geo-nm--kill t))
+	(unless (or (and geo-nm--last-call
+			 (process-live-p geo-nm--last-call))
+		    (and geo-nm--last-call-time
+			 (< (- (float-time)
+			       geo-nm--last-call-time)
+			    geo-nm-delay)))
+	  (geo-nm--async-fetch-json #'geo-nm--moz-callback))))))
+
+(defun geo-nm--pause ()
+  "Pause geo-nm update events."
+  (setq geo-nm--paused t))
+
+(defun geo-nm--resume ()
+  "Resume geo-nm update events."
+  (setq geo-nm--paused nil))
 
 (run-with-timer 0 nil #'geo-nm--timer-callback)
 
 (geo-enable-backend #'geo-nm--subscribe
-		    #'geo-nm--data-invalid-p 2)
+		    #'geo-nm--data-invalid-p 2
+		    #'geo-nm--pause
+		    #'geo-nm--resume)
 
 (dbus-register-signal :system
 		      "org.freedesktop.NetworkManager"
