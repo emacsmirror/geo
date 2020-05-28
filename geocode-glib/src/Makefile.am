@@ -8,6 +8,7 @@ geocode_emacs_so_SOURCES = geocode-emacs.c
 AM_V_CC = @echo "  CC        " $@;
 AM_V_CCLD = @echo "  CCLD      " $@;
 AM_V_ELC = @echo "  ELC       " $@;
+AM_V_at = @echo "  DEP       " $@;
 
 .el.elc: geocode-emacs.so
 	$(AM_V_ELC)$(EMACS) -Q -batch \
