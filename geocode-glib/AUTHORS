@@ -1,4 +1,4 @@
 Would (oldosfan) authored:
       configure.ac Makefile.am src/configure.ac
       src/Makefile.am src/geocode-emacs.c src/config.h.in
-      (and possibly many others.)
+      src/geocode.el (and possibly many others.)
