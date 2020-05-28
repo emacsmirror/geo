@@ -37,6 +37,8 @@ CB will be called with the returned place object."
   (cl-check-type accuracy floatp)
   (async-start
    `(lambda ()
+      ,(async-inject-variables "load-path")
+      (require 'geocode-emacs)
       (ignore-errors
 	(resolve-geocode-place (make-geocode-location ,lat ,lon ,accuracy))))
    cb))

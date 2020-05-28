@@ -5,19 +5,15 @@ geocode-emacs NEWS -- history of user-visible changes.
 Copyright (c) 2020 Would (oldosfan)
 See the end of the file for license conditions.
 
-This file is about changes in geocode-emacs version 2.0.
+This file is about changes in geocode-emacs version 1.0.
 
 * User-visible Lisp changes:
 
-** New function `geocode-async-resolve-lat-lon'
-A funtion that can be used to resolve the object at a location
-asynchronously.
+** resolve-geocode-place
 
-* Incompatible Lisp changes
+New function `resolve-geocode-place' which returns a data structure
+containing information on the given location.
 
-** The library should now be required as 'geocode
-Please replace all instances of (require 'geocode-emacs)
-with (require 'geocode)
 
 This file is part of geocode-emacs.
 
