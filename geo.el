@@ -161,5 +161,17 @@ Additional data can be stored inside REST."
   (mapc #'geo--backend-resume-updates geo--enabled-backends)
   (setq geo--paused-p nil))
 
+(defsubst geo-current-lat ()
+  "Return the current latitude."
+  (let ((loc (geo--sort-slots)))
+    (when loc
+      (geo-location-lat loc))))
+
+(defsubst geo-current-lon ()
+  "Return the current longitude."
+  (let ((loc (geo--sort-slots)))
+    (when loc
+      (geo-location-lon loc))))
+
 (provide 'geo)
 ;;; geo.el ends here
