@@ -24,6 +24,10 @@
     - ~geo-location-lat~ :: Returns the latitude of the location
     - ~geo-location-lon~ :: Returns the longitude of the location
 
+  Along with the following inline functions:
+    - ~geo-current-lon~ :: Return the current longitude.
+    - ~geo-current-lat~ :: Return the current latitude.
+
   To retrieve the last known position, you may also use the function
   ~geo-last-location~.
 
