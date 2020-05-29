@@ -13,11 +13,16 @@ This file is about changes in geocode-emacs version 2.0.
 A funtion that can be used to resolve the object at a location
 asynchronously.
 
+** New field `area' in place objects.
+An `area' field has been added, which corresponds to
+`geocode_place_get_area'.
+
 * Incompatible Lisp changes
 
 ** The library should now be required as 'geocode
 Please replace all instances of (require 'geocode-emacs)
 with (require 'geocode)
+
 
 This file is part of geocode-emacs.
 
