@@ -46,6 +46,9 @@ latitude and longitude.")
 (defvar geo-ip--last-process nil
   "The last process launched by geo-ip.")
 
+(defvar geo-ip--paused-p nil
+  "Whether or not geo-ip updates have been paused.")
+
 (defun geo-ip--get-url (entry)
   "Retrieve the URL from ENTRY."
   (cond ((stringp entry) entry)
@@ -96,8 +99,9 @@ latitude and longitude.")
 
 (defun geo-ip--timer-callback ()
   "Callback to be run from the geo-ip refresh timer."
-  (unless (and geo-ip--last-process
-	       (process-live-p geo-ip--last-process))
+  (unless (or (and geo-ip--last-process
+		   (process-live-p geo-ip--last-process))
+	      geo-ip--paused-p)
     (geo-ip--async-retrieve-ip (lambda (location)
 				 (run-hook-with-args 'geo-ip--changed-hook location)))))
 
@@ -111,10 +115,20 @@ latitude and longitude.")
     (funcall fn geo-ip--last-location))
   (add-hook 'geo-ip--changed-hook fn))
 
+(defun geo-ip--pause ()
+  "Pause geo-ip update signals."
+  (setq geo-ip--paused-p t))
+
+(defun geo-ip--resume ()
+  "Resume geo-ip update signals."
+  (setq geo-ip--paused-p nil))
+
 (run-with-timer 0 (* 60 60) #'geo-ip--timer-callback)
 
 (geo-enable-backend #'geo-ip--subscribe
-		    #'geo-ip--last-ip-invalid-p 1)
+		    #'geo-ip--last-ip-invalid-p 1
+		    #'geo-ip--pause
+		    #'geo-ip--resume)
 
 (provide 'geo-ip)
 ;;; geo-ip.el ends here
