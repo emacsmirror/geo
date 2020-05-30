@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT(geocode_emacs, 2.0.50, none@dummy)
+AC_INIT(geocode_emacs, 2.0.90, none@dummy)
 AM_INIT_AUTOMAKE
 AC_OUTPUT(Makefile src/Makefile)
 
