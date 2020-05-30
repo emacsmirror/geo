@@ -97,6 +97,9 @@ geocode_place_to_emacs (GeocodePlace *place, emacs_env *env)
   lisp_place = lisp_cons (env, lisp_cons (env, Q ("area", env),
 					  S (geocode_place_get_area (place), env)),
 			  lisp_place);
+  lisp_place = lisp_cons (env, lisp_cons (env, Q ("osm-id", env),
+					  S (geocode_place_get_osm_id (place), env)),
+			  lisp_place);
   return lisp_place;
 }
 
