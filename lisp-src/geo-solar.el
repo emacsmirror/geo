@@ -26,6 +26,8 @@
 (require 'geo)
 (require 'solar)
 
+(declare-function geo-xdg--restore-from-cached-value "geo-xdg.el")
+
 (defun geo-solar--on-location-change (loc)
   "Called when the current solar location has been changed to LOC."
   (when loc

@@ -124,10 +124,10 @@ DEVICE should be an object path leading to DEVICE."
 (defun geo-nm--get-aps ()
   "Return a list of access points from NetworkManager."
   (let ((devices (geo-nm--get-devices)))
-    (remove-if #'geo-nm--nomap-p
-	       (mapcar #'geo-nm--ap-properties
-		       (cl-reduce #'append
-				  (mapcar #'geo-nm--wireless-device-aps devices))))))
+    (cl-remove-if #'geo-nm--nomap-p
+		  (mapcar #'geo-nm--ap-properties
+			  (cl-reduce #'append
+				     (mapcar #'geo-nm--wireless-device-aps devices))))))
 
 (defun geo-nm--get-ssids ()
   "Return a list of SSIDs from NetworkManager."
@@ -148,8 +148,8 @@ DATA should be the returned JSON data."
 		  (cons 'lon (cdr (assq 'lng (cdar data))))
 		  (cons 'dt (round (float-time)))))
       (setq geo-nm--last-call-successful-p t)
-      (unless (equal (subseq l 0 2)
-		     (subseq geo-nm-last-result 0 2))
+      (unless (equal (cl-subseq l 0 2)
+		     (cl-subseq geo-nm-last-result 0 2))
 	(run-hook-with-args 'geo-nm-changed-hook geo-nm-last-result)))))
 
 (defun geo-nm--strength-to-dbm (strength)

@@ -1,0 +1,2 @@
+AUTOMAKE_OPTIONS = gnu
+SUBDIRS = lisp-src

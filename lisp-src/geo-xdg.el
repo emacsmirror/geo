@@ -28,6 +28,7 @@
 (require 'cl-lib)
 (require 'geo)
 
+(declare-function userlock--check-content-unchanged "userlock.el")
 (declare-function geo-enable-backend "geo.el")
 
 (defvar geo-xdg--client nil
