@@ -7,6 +7,12 @@ See the end of the file for license conditions.
 
 This file is about changes in geo.el version 1.0.
 
+* User-visible changes:
+
+** geo-ip now supports being paused
+The geo-ip backend will no longer refresh location
+information when it is paused.
+
 This file is part of geo.el.
 
 geo.el is free software: you can redistribute it and/or modify
