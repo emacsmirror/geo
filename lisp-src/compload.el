@@ -9,7 +9,8 @@
 ;; When compiling Emacs Lisp, required packages such as
 ;; async.el are not loaded.  Loading this file tries to
 ;; load the required packages, and also adds the current
-;; directory to the load-path.
+;; directory to the load-path, in order to load in-tree
+;; dependencies.
 
 ;;; Code:
 
