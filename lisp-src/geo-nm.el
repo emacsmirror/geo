@@ -146,7 +146,8 @@ DATA should be the returned JSON data."
       (setq geo-nm-last-result
 	    (list (assq 'lat (cdar data))
 		  (cons 'lon (cdr (assq 'lng (cdar data))))
-		  (cons 'dt (round (float-time)))))
+		  (cons 'dt (round (float-time)))
+		  (assq 'accuracy data)))
       (setq geo-nm--last-call-successful-p t)
       (unless (equal (cl-subseq l 0 2)
 		     (cl-subseq geo-nm-last-result 0 2))
