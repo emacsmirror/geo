@@ -56,6 +56,9 @@
 (defvar geo-nm--paused nil
   "Whether or not updates should be paused.")
 
+(defconst geo-nm--type-wireless 2
+  "Wireless device type.")
+
 (defun geo-nm--nm-available-p ()
   "Return non-nil if NetworkManager is available."
   (ignore-errors
@@ -103,7 +106,8 @@ DEVICE should be an object path leading to DEVICE."
 				"org.freedesktop.NetworkManager"
 				"GetDevices")))
     (cl-remove-if-not (lambda (l)
-			(eq (geo-nm--device-type l) 2)) devl)))
+			(eq (geo-nm--device-type l)
+			    geo-nm--type-wireless)) devl)))
 
 (defun geo-nm--ap-ssid (ap)
   "Return the SSID from the access point alist AP."
