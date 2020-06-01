@@ -174,4 +174,7 @@
     - ~geo-nm-moz-key~ ::
       You can customize the ~geo-nm-moz-key~ variable to set the MLS API key.
       It defaults to the string ~geoclue~.
+    - ~geo-nm-moz-format~ ::
+      The format that will be used to generate request URLs.
+      It should accept a single string, ~geo-nm-moz-key~.
     - ~geo-nm-delay~ :: The minimum amount of time between refreshes.

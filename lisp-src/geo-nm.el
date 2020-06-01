@@ -32,6 +32,9 @@
 (defvar geo-nm-moz-key "geoclue"
   "The API key to be used for requests.")
 
+(defvar geo-nm-moz-url-format "https://location.services.mozilla.com/v1/geolocate?key=%s"
+  "The URL format to be used for location requests.")
+
 (defvar geo-nm-last-result nil
   "The last response retrieved.")
 
@@ -207,8 +210,7 @@ CB will be called with the data as a string."
 		      (url-http-method "POST"))
 		  (ignore-errors
 		    (with-current-buffer (url-retrieve-synchronously
-					  (format "https://location.services.mozilla.com/v1/geolocate?key=%s"
-						  ,geo-nm-moz-key))
+					  (format ,geo-nm-moz-url-format ,geo-nm-moz-key))
 		      (goto-char (point-min))
 		      (search-forward "{")
 		      (previous-line)
