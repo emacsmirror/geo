@@ -33,12 +33,16 @@
 (defvar geo-fallback-registered-handlers nil
   "A list of handlers for geo-fallback.")
 
+(defvar geo-fallback-paused-p nil
+  "Whether or not geo-fallback is paused.")
+
 (defun geo-fallback-notify-changed ()
   "Run geo-fallback handlers."
-  (run-hook-with-args 'geo-fallback-registered-handlers
-		      (geo-location geo-fallback-lat
-				    geo-fallback-lon
-				    (round (float-time)) nil)))
+  (unless geo-fallback-paused-p
+    (run-hook-with-args 'geo-fallback-registered-handlers
+			(geo-location geo-fallback-lat
+				      geo-fallback-lon
+				      (round (float-time)) nil))))
 
 (defun geo-fallback--subscribe (fn)
   "Subscribe FN to `geo-fallback-registered-handlers'."
@@ -49,8 +53,19 @@
   "Return t."
   t)
 
+(defun geo-fallback--pause ()
+  "Pause geo-fallback."
+  (setq geo-fallback-paused-p t))
+
+(defun geo-fallback--resume ()
+  "Resume geo-fallback."
+  (setq geo-fallback-paused-p nil)
+  (geo-fallback-notify-changed))
+
 (geo-enable-backend #'geo-fallback--subscribe
-		    #'geo-fallback--outdated-p 0)
+		    #'geo-fallback--outdated-p 0
+		    #'geo-fallback--pause
+		    #'geo-fallback--resume)
 
 (add-variable-watcher 'geo-fallback-lat #'geo-fallback-notify-changed)
 (add-variable-watcher 'geo-fallback-lon #'geo-fallback-notify-changed)
