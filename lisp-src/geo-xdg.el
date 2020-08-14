@@ -71,6 +71,11 @@ It should take one argument, the value to be saved.")
   "Return non-nil if GeoClue is available."
   (dbus-ping :system "org.freedesktop.GeoClue2" 100))
 
+(defun geo-xdg--client-usable-p ()
+  "Return non-nil if `geo-xdg--client' is a usable GeoClue client."
+  (dbus-introspect-get-interface :system "org.freedesktop.GeoClue2"
+				 geo-xdg--client "org.freedesktop.GeoClue2.Client"))
+
 (defun geo--create-xdg-client ()
   "Create a GeoClue client."
   (if geo-xdg--client geo-xdg--client
@@ -109,8 +114,9 @@ It should take one argument, the value to be saved.")
 
 (defun geo-xdg--maybe-setup ()
   "Set up GeoClue related interfaces if necessary."
-  (when (and (not geo-xdg--client)
-	     (geo-xdg--available-p))
+  (when (or (and (not geo-xdg--client)
+		 (geo-xdg--available-p))
+	    (not (geo-xdg--client-usable-p)))
     (setq geo-xdg--client (geo--create-xdg-client))))
 
 (defun geo-xdg--location-p (loc)
@@ -206,6 +212,7 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 
 (defun geo-xdg--unregister-signals ()
   "Stop recieving LocationUpdated signals."
+  (geo-xdg--maybe-setup)
   (dbus-call-method :system "org.freedesktop.GeoClue2"
 		    geo-xdg--client
 		    "org.freedesktop.GeoClue2.Client"
@@ -213,7 +220,8 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 
 (defun geo-xdg--destroy-client ()
   "Destroy and nil out `geo-xdg--client'."
-  (when geo-xdg--client
+  (when (and geo-xdg--client
+	     (geo-xdg--client-usable-p))
     (setq geo-xdg--client-already-connected nil)
     (dbus-call-method
      :system "org.freedesktop.GeoClue2"
@@ -222,7 +230,10 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
      "DeleteClient"
      :object-path geo-xdg--client)
     (setq geo-xdg--client nil)
-    (mapc #'dbus-unregister-object geo-xdg--things-to-unregister)))
+    (mapc #'dbus-unregister-object geo-xdg--things-to-unregister))
+  (when (and geo-xdg--client
+	     (not (geo-xdg--client-usable-p)))
+    (setq geo-xdg--client nil)))
 
 (defun geo-xdg--maybe-setup-timer-cb ()
   "Periodically check if GeoClue is available, and set up the client if it is."
@@ -242,11 +253,13 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
 (defun geo-xdg-pause ()
   "Stop GeoClue update signals."
   (interactive)
+  (geo-xdg--maybe-setup)
   (geo-xdg--unregister-signals))
 
 (defun geo-xdg-resume ()
   "Resume GeoClue update signals."
   (interactive)
+  (geo-xdg--maybe-setup)
   (geo-xdg--register-signals))
 
 (defun geo-xdg-focus-changed ()
