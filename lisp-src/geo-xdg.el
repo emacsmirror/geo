@@ -78,7 +78,9 @@ It should take one argument, the value to be saved.")
 
 (defun geo--create-xdg-client ()
   "Create a GeoClue client."
-  (if geo-xdg--client geo-xdg--client
+  (if (and geo-xdg--client
+	   (geo-xdg--client-usable-p))
+      geo-xdg--client
     (dbus-call-method
      :system "org.freedesktop.GeoClue2"
      "/org/freedesktop/GeoClue2/Manager"
