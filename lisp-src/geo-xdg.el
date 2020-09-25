@@ -119,12 +119,17 @@ It should take one argument, the value to be saved.")
   (when (or (and (not geo-xdg--client)
 		 (geo-xdg--available-p))
 	    (not (geo-xdg--client-usable-p)))
+    (setq geo-xdg--things-to-unregister nil)
+    (setq geo-xdg--client-already-connected nil)
     (setq geo-xdg--client (geo--create-xdg-client))))
 
 (defun geo-xdg--location-p (loc)
   "Return non-nil if LOC should be considered a `org.freedesktop.GeoClue2.Location'."
   (and (stringp loc)
-       (string-prefix-p (concat geo-xdg--client "/Location") loc)))
+       (ignore-errors
+	 (member "org.freedesktop.GeoClue2.Location"
+		 (dbus-introspect-get-interface-names :system "org.freedesktop.GeoClue2"
+						      loc)))))
 
 (defun geo-xdg-location-lat-long (loc)
   "Return the latitude and longitude stored in LOC as a cons pair."
