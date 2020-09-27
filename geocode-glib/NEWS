@@ -21,6 +21,10 @@ An `area' field has been added, which corresponds to
 An `osm-id' field has been added, which corresponds to
 `geocode_place_get_osm_id'.
 
+** New field `name' in place objects.
+A `name' field has been added, which corresponds to
+`geocode_place_get_name'.
+
 * Incompatible Lisp changes
 
 ** The library should now be required as 'geocode
