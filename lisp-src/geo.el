@@ -42,6 +42,14 @@
 (defvar geo-heading-changed-hook nil
   "Hook to be run with a single argument HEADING when the HEADING is changed.")
 
+(defvar geo--heading-calc-last-location nil
+  "The true last location, used to calculate the current heading.
+This is only used when the heading is not available from the
+compass or a location backend.")
+
+(defvar geo--heading-calc-current-position-cache nil
+  "The true current position, used to calculate the current heading.")
+
 (cl-deftype geo--backend ()
   '(satisfies geo--backend-p))
 
@@ -72,7 +80,9 @@ BACKEND should be the geo.el backend."
 	  (let ((ll (geo-last-location)))
 	    (when (and (not (equal ll location))
 		       (not geo--paused-p))
+	      (setq geo--heading-calc-last-location ll)
 	      (setf (alist-get backend geo--backend-slots nil nil #'equal) location)
+	      (setq geo--heading-calc-current-position-cache (geo--sort-slots))
 	      (run-hook-with-args 'geo-data-changed-hook (geo--sort-slots)))))
       (let ((lh (geo-last-heading)))
 	(when (and (not (equal lh location))
@@ -174,9 +184,36 @@ Additional data can be stored inside REST."
   "Return the last known location from geo.el."
   (geo--sort-slots))
 
+(defun geo--calculate-heading (p1 p2)
+  "Calculate the bearing between points P1 and P2.
+Return the bearing in radians.
+Both arguments should be cons pairs of LAT and LON, in radians."
+  (atan (* (cos (car p2))
+	   (sin (- (cdr p2) (cdr p1))))
+	(- (* (cos (car p1))
+	      (sin (car p2)))
+	   (* (sin (car p1))
+	      (cos (car p2))
+	      (cos (- (cdr p2) (cdr p1)))))))
+
 (defun geo-last-heading ()
-  "Return the last known heading from geo.el."
-  (geo--sort-heading-slots))
+  "Return the last known heading from geo.el.
+The value from the compass takes priority over information
+provided by backends, which in turn take priority over information
+derived from location history."
+  (let ((slot-result (geo--sort-heading-slots)))
+    (if slot-result slot-result
+      (when (and geo--heading-calc-current-position-cache
+		 geo--heading-calc-last-location)
+	(radians-to-degrees
+	 (geo--calculate-heading (cons (degrees-to-radians (geo-location-lat
+							    geo--heading-calc-last-location))
+				       (degrees-to-radians (geo-location-lon
+							    geo--heading-calc-last-location)))
+				 (cons (degrees-to-radians (geo-location-lat
+							    geo--heading-calc-current-position-cache))
+				       (degrees-to-radians (geo-location-lon
+							    geo--heading-calc-current-position-cache)))))))))
 
 (defun geo-pause ()
   "Pause location refreshes from geo.el."
