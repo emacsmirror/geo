@@ -74,7 +74,7 @@
   ~geo-xdg~ is an Emacs Lisp library for interfacing with the XDG
   GeoClue geolocation API.  There are 4 entry-points for using the API:
    - ~geo-xdg-last-location~ ::
-     This variable stores the last recieved location, in a format
+     This variable stores the last received location, in a format
      described inside [[Location Format]].  It may be nil if no location
      exists.  The heading data is not stored.
    - ~geo-xdg-changed-hooks~ ::

@@ -306,12 +306,12 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
   (> (- (float-time) (cdr (assq 'dt geo-xdg-last-location))) 100000))
 
 (defun geo-xdg--geo-register (fn)
-  "Register the Geo backend FN to recieve location callbacks."
+  "Register the Geo backend FN to receive location callbacks."
   (add-hook 'geo-xdg-changed-hooks fn)
   (run-hook-with-args 'geo-xdg-changed-hooks geo-xdg-last-location))
 
 (defun geo-xdg--geo-register-for-heading (fn)
-  "Register the Geo backend FN to recieve heading callbacks."
+  "Register the Geo backend FN to receive heading callbacks."
   (add-hook 'geo-xdg-heading-changed-hook fn)
   (run-hook-with-args 'geo-xdg-heading-changed-hook geo-xdg-last-heading))
 
