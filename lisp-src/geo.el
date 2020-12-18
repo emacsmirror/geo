@@ -156,7 +156,7 @@ the heading as the sole argument."
   (let ((backend (list priority subscribe-function outdated-p-function
 		       stop-function start-function heading-function)))
     (cl-check-type backend geo--backend)
-    (unless (member geo--enabled-backends backend)
+    (unless (member backend geo--enabled-backends)
       (geo--backend-register-function backend (lambda (l)
 						(geo--update-handler l backend)))
       (setq geo--enabled-backends (cons backend geo--enabled-backends)))))
