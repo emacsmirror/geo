@@ -43,8 +43,14 @@
 (defvar geo-xdg-changed-hooks nil
   "A list of functions to be called with the location data when it is updated.")
 
+(defvar geo-xdg-heading-changed-hook nil
+  "A list of functions to be called with heading data on update.")
+
 (defvar geo-xdg-last-location nil
   "The last registered location.")
+
+(defvar geo-xdg-last-heading nil
+  "The last registered heading.")
 
 (defvar geo-xdg-cache-function #'geo-xdg-get-cache
   "A function that returns the cached location.")
@@ -183,10 +189,17 @@ The returned data will be stored in the following format:
 				   loc "org.freedesktop.GeoClue2.Location"
 				   "Timestamp")))))
 
+(defun geo-xdg--location-heading (location)
+  "Return the heading from LOCATION."
+  (dbus-get-property :system "org.freedesktop.GeoClue2"
+		     location "org.freedesktop.GeoClue2.Location"
+		     "Heading"))
+
 (defun geo-xdg--dbus-callback (_ new)
   "Callback for GeoClue2's LocationUpdated signal.
 NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
-  (let ((ld (geo-xdg--location-data new)))
+  (let ((ld (geo-xdg--location-data new))
+	(hd (geo-xdg--location-heading new)))
     (when (not (equal geo-xdg-last-location ld))
       (ignore-errors
 	(setq geo-xdg-last-location ld))
@@ -194,7 +207,12 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
       (ignore-errors
 	(funcall geo-xdg-save-cache-function geo-xdg-last-location))
       (ignore-errors
-	(run-hook-with-args 'geo-xdg-changed-hooks geo-xdg-last-location)))))
+	(run-hook-with-args 'geo-xdg-changed-hooks geo-xdg-last-location)))
+    (when (not (equal geo-xdg-last-heading hd))
+      (ignore-errors
+	(setq geo-xdg-last-heading hd))
+      (ignore-errors
+	(run-hook-with-args 'geo-xdg-heading-changed-hook geo-xdg-last-heading)))))
 
 (defun geo-xdg--register-signals ()
   "Register the LocationUpdated signal for the current GeoClue client."
@@ -292,10 +310,17 @@ NEW should be the new location as an `org.freedesktop.GeoClue2.Location'"
   (add-hook 'geo-xdg-changed-hooks fn)
   (run-hook-with-args 'geo-xdg-changed-hooks geo-xdg-last-location))
 
-(geo-enable-backend #'geo-xdg--geo-register
-		    #'geo-xdg--data-outdated-p 3
-		    #'geo-xdg-pause
-		    #'geo-xdg-resume)
+(defun geo-xdg--geo-register-for-heading (fn)
+  "Register the Geo backend FN to recieve heading callbacks."
+  (add-hook 'geo-xdg-heading-changed-hook fn)
+  (run-hook-with-args 'geo-xdg-heading-changed-hook geo-xdg-last-heading))
+
+(eval-after-load 'geo
+  '(geo-enable-backend #'geo-xdg--geo-register
+		       #'geo-xdg--data-outdated-p 3
+		       #'geo-xdg-pause
+		       #'geo-xdg-resume
+		       #'geo-xdg--geo-register-for-heading))
 
 (provide 'geo-xdg)
 ;;; geo-xdg.el ends here

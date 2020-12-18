@@ -5,15 +5,16 @@
   It is extensible and allows for multiple backends.  To create backends,
   please view [[Creating Backends]].
 
-  The primary endpoint for interfacing with ~geo~ is the Lisp variable
-  ~geo-xdg-changed-hook~, which accepts functions accepting a single
-  location argument.  The location objects are alists guaranteed to
-  have 3 fields:
+  The primary entry point for interfacing with geo is the Lisp
+  variable ~geo-xdg-changed-hook~, which accepts functions accepting a
+  single location argument.  The location objects are alists
+  guaranteed to have 3 fields:
     - ~lat~ :: The latitude of the location.
     - ~lon~ :: The longitude of the location.
     - ~dt~ :: The time the location was recorded, in epoch seconds.
 
-  There are also several optional fields that may or may not exist in locations:
+  There are also several optional fields that may or may not exist in
+  locations:
     - ~accuracy~ ::
       The distance (in metres) around the location the actual location is within 
       at a 95% confidence.
@@ -31,9 +32,19 @@
   To retrieve the last known position, you may also use the function
   ~geo-last-location~.
 
+  In addition to the features mentioned above, geo also supports
+  retrieving the current heading from the device.  The main entry
+  point for doing so is the variable ~geo-xdg-changed-hook~, a list of
+  functions accepting a sole heading argument that is the current
+  heading of the device in degrees from north in a clockwise
+  direction.
+
+  The function ~geo-xdg-last-heading~ can also be used to retrieve the
+  last known heading.
+
 ** Creating Backends
    geo backends are primarily created via the function ~geo-enable-backend~,
-   which accepts 3 arguments:
+   which accepts 3 mandatory arguments:
     - ~subscribe-function~ ::
       This should be a procedure accepting one argument, which is another
       function that should be called with the current location whenever
@@ -46,18 +57,38 @@
       This should be a integer.  The higher the integer is, the more priority
       the backend will get.
 
+   ~geo-enable-backend~ also supports 3 other optional arguments
+    - ~stop-function~ ::
+      A procedure that should not accept any arguments, and
+      effectively pause location updates from the backend.
+    - ~start-function~ ::
+      A procedure that should not accept any arguments, and
+      effectively resume location updates from the backend.
+    - ~heading-function~ ::
+      A procedure that accepts a single function, that should be
+      called with the current heading once it is changed, and when the
+      backend is created.
+
 
 * geo-xdg
   ~geo-xdg~ is an Emacs Lisp library for interfacing with the XDG
-  GeoClue geolocation API.  There are 2 entry-points for using the API:
+  GeoClue geolocation API.  There are 4 entry-points for using the API:
    - ~geo-xdg-last-location~ ::
      This variable stores the last recieved location, in a format
      described inside [[Location Format]].  It may be nil if no location
-     exists.
+     exists.  The heading data is not stored.
    - ~geo-xdg-changed-hooks~ ::
-     This hook stores a list of functions that accept a single argument
-     ~LOCATION~, which should be the new location.  The functions are
-     called whenever the current location is changed.
+     This hook stores a list of functions that accept a single
+     argument ~LOCATION~, which should be the new location.  The
+     functions are called whenever the current location is changed.
+     The heading data is not taken into account.
+   - ~geo-xdg-last-heading~ ::
+     This variable stores the last retrieved heading, as the number of
+     degrees clockwise from north.
+   - ~geo-xdg-heading-changed-hooks~ ::
+     This hook is triggered whenever the current heading is changed,
+     with a single argument ~HEADING~, which is the current heading,
+     as degrees clockwise from the north.
 
   geo-xdg is also a backend for the ~geo~ geolocation library.
   To use it with geo, append the following to your initialization files:

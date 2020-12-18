@@ -36,6 +36,12 @@
 (defvar geo--paused-p nil
   "Whether or not geo.el updates are paused.")
 
+(defvar geo--heading-backend-slots nil
+  "Slots for various geo.el heading backends.")
+
+(defvar geo-heading-changed-hook nil
+  "Hook to be run with a single argument HEADING when the HEADING is changed.")
+
 (cl-deftype geo--backend ()
   '(satisfies geo--backend-p))
 
@@ -52,23 +58,34 @@
        (or (null (cadddr backend))
 	   (ignore-errors (eq (car (func-arity (cadddr backend))) 0)))
        (or (null (car (cddddr backend)))
-	   (ignore-errors (eq (car (func-arity (car (cddddr backend)))) 0)))))
+	   (ignore-errors (eq (car (func-arity (car (cddddr backend)))) 0)))
+       (or (null (car (cdr (cddddr backend))))
+	   (ignore-errors (eq (car (func-arity (car (cdr (cddddr backend))))) 1)))))
 
 (defun geo--update-handler (location backend)
   "Update handler for a geo backend.
-LOCATION should be a `geo--location',
-and BACKEND should be the geo.el backend."
+LOCATION should be a `geo--location', or a heading.
+BACKEND should be the geo.el backend."
   (when location
-    (let ((ll (geo-last-location)))
-      (setf (alist-get backend geo--backend-slots nil nil #'equal) location)
-      (when (and (not (equal ll (geo--sort-slots)))
-		 geo--paused-p)
-	(run-hook-with-args 'geo-data-changed-hook (geo--sort-slots))))))
+    (if (consp location)
+	(progn
+	  (let ((ll (geo-last-location)))
+	    (when (and (not (equal ll location))
+		       (not geo--paused-p))
+	      (setf (alist-get backend geo--backend-slots nil nil #'equal) location)
+	      (run-hook-with-args 'geo-data-changed-hook (geo--sort-slots)))))
+      (let ((lh (geo-last-heading)))
+	(when (and (not (equal lh location))
+		   (not geo--paused-p))
+	  (setf (alist-get backend geo--heading-backend-slots nil nil #'equal) location)
+	  (run-hook-with-args 'geo-heading-changed-hook lh))))))
 
 (defun geo--backend-register-function (backend fn)
   "Register a single function FN to be called when BACKEND's location is changed."
   (cl-check-type backend geo--backend)
-  (funcall (cadr backend) fn))
+  (funcall (cadr backend) fn)
+  (when (car (cdr (cddddr backend)))
+    (funcall (car (cdr (cddddr backend))) fn)))
 
 (defun geo--backend-priority (backend)
   "Return BACKEND's priority.
@@ -113,13 +130,21 @@ The higher it is, the more important BACKEND is."
 									 (cdr (assq 'dt (cdr i)))))))))))
       (or good-entry bad-entry))))
 
+(defun geo--sort-heading-slots ()
+  "Return the best entry in `geo--heading-backend-slots'."
+  (car-safe (mapcar #'cdr (cl-sort geo--heading-backend-slots (lambda (x i)
+								(> (caar x) (caar i)))))))
+
 (defun geo-enable-backend (subscribe-function outdated-p-function priority &optional
-					      stop-function start-function)
+					      stop-function start-function heading-function)
   "Enable a backend with SUBSCRIBE-FUNCTION, OUTDATED-P-FUNCTION, and PRIORITY.
 STOP-FUNCTION should be a function that pauses location updates.
-START-FUNCTION should be a function that resumes location updates."
+START-FUNCTION should be a function that resumes location
+updates.  HEADING-FUNCTION should be a function that accepts a
+single argument FN, to be called when the heading is changed with
+the heading as the sole argument."
   (let ((backend (list priority subscribe-function outdated-p-function
-		       stop-function start-function)))
+		       stop-function start-function heading-function)))
     (cl-check-type backend geo--backend)
     (unless (member geo--enabled-backends backend)
       (geo--backend-register-function backend (lambda (l)
@@ -148,6 +173,10 @@ Additional data can be stored inside REST."
 (defun geo-last-location ()
   "Return the last known location from geo.el."
   (geo--sort-slots))
+
+(defun geo-last-heading ()
+  "Return the last known heading from geo.el."
+  (geo--sort-heading-slots))
 
 (defun geo-pause ()
   "Pause location refreshes from geo.el."
