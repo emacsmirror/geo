@@ -5,13 +5,19 @@ geo.el NEWS -- history of user-visible changes.
 Copyright (c) 2020 Would (oldosfan)
 See the end of the file for license conditions.
 
-This file is about changes in geo.el version 2.1.
+This file is about changes in geo.el version 2.0.
 
 * User-visible changes:
 
-** New `geo-simulate' backend
-This backend allows the user to realistically simulate movements based
-on real time.
+** Heading support in `geo-xdg'
+The variable and hook `geo-xdg-last-heading' and
+`geo-xdg-heading-changed-hooks' respectively provide support for
+retrieving the current heading of the device.
+
+** Heading support in `geo'
+The hook and function `geo-heading-changed-hook' and
+`geo-last-heading' respectively provide support for retrieving
+the heading of the device.
 
 This file is part of geo.el.
 
